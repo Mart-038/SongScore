@@ -21,11 +21,7 @@ public class IndexController {
 
     @GetMapping("/")
     public String showIndexPage(Model model) {
-        log.debug("Indexpagina opgevraagd");
-        model.addAttribute("naam", "Mart");
-        model.addAttribute("datum", LocalDate.now().toString());
-        log.info("Startpagina getoond om {}", LocalTime.now());
-        return "index";
+        return "redirect:/song/all";
     }
 
 }
