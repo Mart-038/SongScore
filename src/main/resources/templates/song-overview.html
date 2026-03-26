@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${paginatitel}">Title</title>
+</head>
+<body>
+    <h1 th:text="${paginatitel}"></h1>
+
+    <form method="get" action="/song/all">
+        <input type="text" name="query" id="zoeken"
+               th:value="${query}"
+               placeholder="Zoek op titel...">
+        <button type="submit"><label for="zoeken">Zoeken</label></button>
+    </form>
+
+    <div    th:if="${successMessage}"
+            class="alert alert-success">
+        <span th:text="${successMessage}">Opgeslagen!</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nummer</th>
+                <th>Artiest</th>
+                <th>Genre</th>
+                <th>Jaar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="song : ${songs}">
+                <td>
+                    <a
+                            th:href="@{{songId}(songId=${song.id})}"
+                            th:text="${song.title}">
+                        Titel
+                    </a>
+                </td>
+                <td>
+                    <span th:each="artist, iterStat : ${song.artists}">
+                        <span th:text="${artist.name}"></span><span th:if="!${iterStat.last}">, </span>
+                    </span>
+                </td>
+                <td th:text="${song.genre}"></td>
+                <td th:text="${song.year}"></td>
+                <td><a th:href="@{/song/edit/{songId}(songId=${song.id})}">Bewerken</a></td>
+                <td><a th:href="@{/song/delete/{songId}(songId=${song.id})}">Verwijderen</a> </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><a th:href="@{/song/add}">Een nummer toevoegen</a></p>
+</body>
+</html>

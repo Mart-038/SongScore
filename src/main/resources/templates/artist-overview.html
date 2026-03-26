@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Artiestenoverzicht</title>
+</head>
+<body>
+    <h1>Artiesten</h1>
+
+    <div    th:if="${successMessage}"
+            class="alert alert-success">
+        <span th:text="${successMessage}">Opgeslagen!</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Artiest</th>
+                <th>Jaar opgericht</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="artist : ${artists}">
+                <td th:text="${artist.name}"></td>
+                <td th:text="${artist.activeSince}"></td>
+                <td>
+                    <a th:href="@{/artist/delete/{artistId}(artistId=${artist.id})}">Verwijderen</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <a th:href="@{/artist/add}">Artiest toevoegen</a>
+</body>
+</html>

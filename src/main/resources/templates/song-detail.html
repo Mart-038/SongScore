@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="|Details van ${song.title}|">Detailpagina</title>
+</head>
+<body>
+    <h1 th:text="${song.title}">Detailpagina</h1>
+
+    <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artistName}">artiest
+    </span> in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
+
+    <h2>Ratings</h2>
+    <ul>
+        <li th:each="rating : ${song.ratings}" th:text="${rating.rateScore}"></li>
+    </ul>
+
+</body>
+</html>

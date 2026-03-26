@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${naam}">Title</title>
+</head>
+<body>
+    <h1>Welkom op de SongScore-website van <span th:text="${naam}"></span></h1>
+    <p>Vandaag is het <span th:text="${datum}"></span></p>
+    <a href="/songs">Nummers</a>
+</body>
+</html>

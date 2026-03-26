@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nummer toevoegen of bewerken - SongScore</title>
+    <link rel="stylesheet" href="/Style.css">
+</head>
+<body>
+    <h1>Nummer toevoegen/bewerken</h1>
+
+    <form th:action="@{/song/save}" th:object="${song}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <div>
+            <label for="title">Titel</label>
+            <input type="text" id="title" th:field="*{title}">
+            <span th:if="${#fields.hasErrors('title')}"
+                  th:errors="*{title}"
+                  class="error">
+            </span>
+        </div>
+        <div>
+            <label for="artistName">Artiest</label>
+            <input type="text" id="artistName" th:field="*{artistName}">
+            <span th:if="${#fields.hasErrors('artistName')}"
+                  th:errors="*{artistName}"
+                  class="error">
+            </span>
+        </div>
+        <div>
+            <label for="genre">Genre</label>
+            <input type="text" id="genre" th:field="*{genre}">
+            <span th:if="${#fields.hasErrors('genre')}"
+                  th:errors="*{genre}"
+                  class="error">
+            </span>
+        </div>
+        <div>
+            <label for="year">Jaar</label>
+            <input type="number" id="year" th:field="*{year}">
+            <span th:if="${#fields.hasErrors('year')}"
+                  th:errors="*{year}"
+                  class="error">
+            </span>
+        </div>
+        <button type="submit">Opslaan</button>
+    </form>
+
+</body>
+</html>
