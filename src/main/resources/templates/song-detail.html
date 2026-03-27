@@ -7,7 +7,7 @@
 <body>
     <h1 th:text="${song.title}">Detailpagina</h1>
 
-    <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artistName}">artiest
+    <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artists[0].name}">artiest
     </span> in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
 
     <h2>Ratings</h2>

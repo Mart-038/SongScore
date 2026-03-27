@@ -6,8 +6,10 @@ package nl.miwnn.ch19.mart.songscore.controller;
  * */
 
 import jakarta.validation.Valid;
+import nl.miwnn.ch19.mart.songscore.model.Artist;
 import nl.miwnn.ch19.mart.songscore.model.Rating;
 import nl.miwnn.ch19.mart.songscore.model.Song;
+import nl.miwnn.ch19.mart.songscore.repository.ArtistRepository;
 import nl.miwnn.ch19.mart.songscore.repository.SongRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,11 @@ public class SongController {
 
     private static final Logger log = LoggerFactory.getLogger(SongController.class);
     private final SongRepository songRepository;
+    private final ArtistRepository artistRepository;
 
-    public SongController(SongRepository songRepository) {
+    public SongController(SongRepository songRepository, ArtistRepository artistRepository) {
         this.songRepository = songRepository;
+        this.artistRepository = artistRepository;
     }
 
     @GetMapping("/all")
@@ -52,30 +56,31 @@ public class SongController {
             displaySongs = songs;
         }
 
-        model.addAttribute("paginatitel", "Nummeroverzicht");
+        model.addAttribute("activePage", "songs");
         model.addAttribute("songs", displaySongs);
         model.addAttribute("query", query);
         return "song-overview";
-    }
-
-    @GetMapping("/{songId}")
-    public String showSongDetailPage(@PathVariable Long songId, Model model) {
-        Optional<Song> song = songRepository.findById(songId);
-        if (song.isEmpty()) {
-            log.warn("Detailpagina aangevraagd voor nummer met id {}, niet gevonden", songId);
-            return "redirect:/song/all";
-        }
-
-        log.debug("Detailpagina van het nummer {} aangevraagd", song.get().getTitle());
-
-        model.addAttribute("song", song.get());
-        return "song-detail";
     }
 
     @GetMapping("/add")
     public String showSongAddForm(Model model) {
         log.debug("Leeg nummerformulier opgevraagd");
         model.addAttribute("song", new Song());
+        model.addAttribute("allArtists", artistRepository.findAll());
+        return "add-edit-song";
+    }
+
+    @GetMapping("/edit/{songId}")
+    public String showSongEditForm(@PathVariable Long songId, Model model) {
+        log.debug("Bewerkformulier opgevraagd voor: {}", songId);
+
+        Optional<Song> songToEdit = songRepository.findById(songId);
+        if (songToEdit.isEmpty()) {
+            log.warn("Nummer met ID {} niet gevonden voor bewerking", songId);
+            return "redirect:/song/all";
+        }
+        model.addAttribute("song", songToEdit);
+        model.addAttribute("allArtists", artistRepository.findAll());
         return "add-edit-song";
     }
 
@@ -104,24 +109,28 @@ public class SongController {
         return "redirect:/song/all";
     }
 
-    @GetMapping("/edit/{songId}")
-    public String showSongEditForm(@PathVariable Long songId, Model model) {
-        log.debug("Bewerkformulier opgevraagd voor: {}", songId);
-
-        Optional<Song> songToEdit = songRepository.findById(songId);
-        if (songToEdit.isEmpty()) {
-            log.warn("Nummer met ID {} niet gevonden voor bewerking", songId);
-            return "redirect:/song/all";
-        }
-        model.addAttribute("song", songToEdit);
-        return "add-edit-song";
-    }
-
     @GetMapping("/delete/{songId}")
     public String deleteSong(@PathVariable Long songId) {
         log.info("Nummer verwijderd: {}", songId);
         songRepository.deleteById(songId);
         return "redirect:/song/all";
+    }
+
+    @GetMapping("/{artistName}/{title}")
+    public String showSongDetailPage(@PathVariable String artistName, @PathVariable String title, Model model) {
+        Artist firstArtist = artistRepository.findArtistByNameIgnoreCase(artistName)
+                .orElseThrow(() -> new IllegalArgumentException("Artist with given name not found"));
+        Optional<Song> song = songRepository.findSongByTitleAndArtistsContains(title, firstArtist);
+
+        if (song.isEmpty()) {
+            log.warn("Detailpagina aangevraagd voor nummer met titel {}, niet gevonden", title);
+            return "redirect:/song/all";
+        }
+
+        log.debug("Detailpagina van het nummer {} aangevraagd", song.get().getTitle());
+
+        model.addAttribute("song", song.get());
+        return "song-detail";
     }
 
 }

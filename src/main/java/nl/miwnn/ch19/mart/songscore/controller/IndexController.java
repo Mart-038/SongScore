@@ -2,7 +2,7 @@ package nl.miwnn.ch19.mart.songscore.controller;
 
 /*
  * @author Mart Stukje
- * Handle requests
+ * Handle request to index page
  * */
 
 import org.slf4j.Logger;

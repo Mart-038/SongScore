@@ -5,10 +5,7 @@ package nl.miwnn.ch19.mart.songscore.model;
  * A musician or a group of musicians that have recorded one or multiple songs
  * */
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
@@ -16,25 +13,26 @@ public class Artist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "De naam mag niet leeg zijn")
     @Size(max = 200, message = "De naam mag niet meer dan {max} tekens bevatten")
+    @Column(unique = true)
     private String name;
 
     @NotNull(message = "Het jaar mag niet leeg zijn")
     @Min(value = 1000, message = "Het jaar mag niet lager dan {value} zijn")
     @Max(value = 2030, message = "Het jaar mag niet hoger dan {value} zijn")
-    private int activeSince;
+    private Integer activeSince;
 
     public Artist() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -46,11 +44,11 @@ public class Artist {
         this.name = name;
     }
 
-    public int getActiveSince() {
+    public Integer getActiveSince() {
         return activeSince;
     }
 
-    public void setActiveSince(int activeSince) {
+    public void setActiveSince(Integer activeSince) {
         this.activeSince = activeSince;
     }
 }

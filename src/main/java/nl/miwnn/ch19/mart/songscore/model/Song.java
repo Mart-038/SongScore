@@ -17,14 +17,14 @@ public class Song {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "De titel mag niet leeg zijn")
     @Size(max = 200, message = "De titel mag niet meer dan {max} tekens bevatten")
     private String title;
 
     @ManyToMany
-    private List<Artist> artists;
+    private List<Artist> artists = new ArrayList<>();
 
     @NotBlank(message = "Het genre mag niet leeg zijn")
     @Size(max = 200, message = "Het genre mag niet meer dan {max} tekens bevatten")
@@ -48,11 +48,11 @@ public class Song {
     public Song() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

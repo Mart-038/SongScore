@@ -35,6 +35,7 @@ public class ArtistController {
         log.debug("Showing artist overview");
         List<Artist> artists = artistRepository.findAll();
         model.addAttribute("artists", artists);
+        model.addAttribute("activePage", "artists");
         return "artist-overview";
     }
 
@@ -50,6 +51,23 @@ public class ArtistController {
                                    BindingResult bindingResult,
                                    RedirectAttributes redirectAttributes) {
         log.info("Artiest opslaan: {}", updatedArtist.getName());
+
+        if (updatedArtist.getId() != null &&
+                artistRepository
+                        .findById(updatedArtist.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("ID niet gevonden in database"))
+                        .getName().equals(updatedArtist.getName())
+        ) {
+            log.debug("Updating artist, name remains the same");
+        } else {
+            if (artistRepository.findArtistByNameIgnoreCase(updatedArtist.getName()).isPresent()) {
+                log.warn("Updating artist, name already exists in DB so should not be allowed");
+                bindingResult.rejectValue(
+                        "name",
+                        "alreadyExists",
+                        "Deze naam komt al voor in de lijst");
+            }
+        }
 
         if (bindingResult.hasErrors()) {
             log.warn("Validatiefouten bij opslaan artiest: {}", bindingResult.getErrorCount());

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Nummer toevoegen of bewerken - SongScore</title>
-    <link rel="stylesheet" href="/Style.css">
+    <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
     <h1>Nummer toevoegen/bewerken</h1>
@@ -19,12 +19,13 @@
             </span>
         </div>
         <div>
-            <label for="artistName">Artiest</label>
-            <input type="text" id="artistName" th:field="*{artistName}">
-            <span th:if="${#fields.hasErrors('artistName')}"
-                  th:errors="*{artistName}"
-                  class="error">
-            </span>
+            <label for="artists">Artiest(en)</label>
+            <select id="artists" th:field="*{artists}">
+                <option th:each="artist : ${allArtists}"
+                        th:value="${artist.id}"
+                        th:text="${artist.name}">
+                </option>
+            </select>
         </div>
         <div>
             <label for="genre">Genre</label>

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${paginatitel}">Title</title>
+<head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
+    <title>Nummeroverzicht</title>
 </head>
+
 <body>
-    <h1 th:text="${paginatitel}"></h1>
+    <nav th:replace="~{fragments/general :: navbar}"></nav>
+
+    <h1>Nummeroverzicht</h1>
 
     <form method="get" action="/song/all">
         <input type="text" name="query" id="zoeken"
@@ -32,7 +34,7 @@
             <tr th:each="song : ${songs}">
                 <td>
                     <a
-                            th:href="@{{songId}(songId=${song.id})}"
+                            th:href="@{{artistName}/{title}(artistName=${song.artists[0].name}, title=${song.title})}"
                             th:text="${song.title}">
                         Titel
                     </a>
@@ -51,5 +53,7 @@
     </table>
 
     <p><a th:href="@{/song/add}">Een nummer toevoegen</a></p>
+
+    <footer th:replace="~{fragments/general :: footer}"></footer>
 </body>
 </html>
