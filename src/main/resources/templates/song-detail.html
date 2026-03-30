@@ -1,19 +1,48 @@
 <!DOCTYPE html>
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+
+<head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title th:text="|Details van ${song.title}|">Detailpagina</title>
 </head>
 <body>
-    <h1 th:text="${song.title}">Detailpagina</h1>
+    <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
-    <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artists[0].name}">artiest
-    </span> in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
+    <div class="container">
+        <h1 th:text="${song.title}">Detailpagina</h1>
 
-    <h2>Ratings</h2>
-    <ul>
-        <li th:each="rating : ${song.ratings}" th:text="${rating.rateScore}"></li>
-    </ul>
+        <div class="row">
+            <div class="col">
+                <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artists[0].name}">artiest</span>
+                    in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
+            </div>
+            <div class="col">
+                <div class="gap-2 justify-content-center pb-5">
+                    <a th:href="@{/song/edit/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
+                        <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </a>
+                </div>
+                <div class="gap-2 justify-content-center pb-5">
+                    <a th:href="@{/song/delete/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
+                        <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
 
+        <div>
+            <h2>Ratings</h2>
+            <ul>
+                <li th:each="rating : ${song.ratings}" th:text="${rating.rateScore}"></li>
+            </ul>
+        </div>
+    </div>
+
+    <footer th:replace="~{/fragments/general :: footer}"></footer>
+
+    <div th:replace="~{/fragments/general :: scripts}"></div>
 </body>
 </html>

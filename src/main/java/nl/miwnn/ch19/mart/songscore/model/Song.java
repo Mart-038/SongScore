@@ -8,7 +8,6 @@ package nl.miwnn.ch19.mart.songscore.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ public class Song {
     private String title;
 
     @ManyToMany
+    @NotEmpty(message = "Er moet minstens één artiest geselecteerd worden")
     private List<Artist> artists = new ArrayList<>();
 
     @NotBlank(message = "Het genre mag niet leeg zijn")

@@ -1,59 +1,58 @@
 <!DOCTYPE html>
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title>Nummeroverzicht</title>
 </head>
-
 <body>
-    <nav th:replace="~{fragments/general :: navbar}"></nav>
+    <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
-    <h1>Nummeroverzicht</h1>
+    <div class="container">
+        <h1>Nummeroverzicht</h1>
 
-    <form method="get" action="/song/all">
-        <input type="text" name="query" id="zoeken"
-               th:value="${query}"
-               placeholder="Zoek op titel...">
-        <button type="submit"><label for="zoeken">Zoeken</label></button>
-    </form>
+        <div class="row">
+            <div class="col-sm-4">
+                <form method="get" action="/song/all" class="mb-3">
+                    <input type="text" name="query" id="zoeken"
+                           th:value="${query}"
+                           placeholder="Zoek op titel...">
+                    <button type="submit"><label for="zoeken">Zoeken</label></button>
+                </form>
+            </div>
+            <div class="col-sm-4">
+                <p><a th:href="@{/song/add}">Een nummer toevoegen</a></p>
+            </div>
+        </div>
 
-    <div    th:if="${successMessage}"
-            class="alert alert-success">
-        <span th:text="${successMessage}">Opgeslagen!</span>
+
+        <div    th:if="${successMessage}"
+                class="alert alert-success mb-3">
+            <span th:text="${successMessage}">Opgeslagen!</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="song : ${songs}">
+                <a th:href="@{/song/{artistName}/{title}(artistName=${song.artists[0].name}, title=${song.title})}"
+                   class="text-decoration-none text-dark">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 th:text="${song.title}"
+                                class="card-title">Titel</h2>
+                            <p th:text="${song.year}"
+                               class="card-subtitle mb-2 text-body-secondary">Jaar</p>
+                            <p class="card-text "><span th:each="artist, iterStat : ${song.artists}">
+                        <span th:text="${artist.name}"></span><span th:if="!${iterStat.last}">, </span></span>
+                                <span th:text="${song.genre}">Genre</span></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nummer</th>
-                <th>Artiest</th>
-                <th>Genre</th>
-                <th>Jaar</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="song : ${songs}">
-                <td>
-                    <a
-                            th:href="@{{artistName}/{title}(artistName=${song.artists[0].name}, title=${song.title})}"
-                            th:text="${song.title}">
-                        Titel
-                    </a>
-                </td>
-                <td>
-                    <span th:each="artist, iterStat : ${song.artists}">
-                        <span th:text="${artist.name}"></span><span th:if="!${iterStat.last}">, </span>
-                    </span>
-                </td>
-                <td th:text="${song.genre}"></td>
-                <td th:text="${song.year}"></td>
-                <td><a th:href="@{/song/edit/{songId}(songId=${song.id})}">Bewerken</a></td>
-                <td><a th:href="@{/song/delete/{songId}(songId=${song.id})}">Verwijderen</a> </td>
-            </tr>
-        </tbody>
-    </table>
+    <footer th:replace="~{/fragments/general :: footer}"></footer>
 
-    <p><a th:href="@{/song/add}">Een nummer toevoegen</a></p>
-
-    <footer th:replace="~{fragments/general :: footer}"></footer>
+    <div th:replace="~{/fragments/general :: scripts}"></div>
 </body>
 </html>

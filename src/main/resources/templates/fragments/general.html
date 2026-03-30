@@ -3,32 +3,53 @@
 
 <head th:fragment="baseheader(title)">
     <meta charset="UTF-8">
-
-    <title th:replace="${title}">Base title</title>
+    <meta   name="viewport"
+            content="width=device-width, initial-scale=1">
+    <title th:replace="${title}">SongScore</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}">
     <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
-
-    <nav th:fragment="navbar">
-        <ul>
-            <li>
-                <a  href="/song/all"
-                    th:classappend="${activePage == 'songs'} ? 'active' : ''">
-                    Nummers
-                </a>
-            </li>
-            <li>
-                <a  href="/artist/all"
-                    th:classappend="${activePage == 'artists'} ? 'active' : ''">
-                    Artiesten
-                </a>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary"
+         th:fragment="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img th:src="@{/images/songscore-logo.png}" alt="SongScore logo" width="36"
+                     class="d-inline-block align-text-top">
+                SongScore
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" aria-current="page"
+                       th:classappend="${activePage == 'songs'} ? 'active' : ''"
+                       href="/song/all">Nummers</a>
+                    <a class="nav-link"
+                       th:classappend="${activePage == 'artists'} ? 'active' : ''"
+                       href="/artist/all">Artiesten</a>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <footer th:fragment="footer">
-        <p>&copy;SongScore - Mart Stukje 2026</p>
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+            th:fragment="footer">
+        <div class="col-md-4 d-flex align-items-center">
+            <a class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1" href="/">
+                <img th:src="@{/images/songscore-logo.png}" alt="SongScore logo" height="30">
+            </a>
+            <span class="mb-3 mb-md-0 text-body-secondary">&copy;SongScore - Mart Stukje 2026</span>
+        </div>
     </footer>
 
+    <div th:fragment="scripts">
+        <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}">
+        </script>
+    </div>
 </body>
 </html>

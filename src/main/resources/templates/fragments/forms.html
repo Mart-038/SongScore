@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="formField(fieldName, labelName, type)"
+         th:with="submitted=${#fields.hasErrors('*')}"
+         class="form-floating mb-3 has-validation"
+    >
+        <input th:type="${type}"
+               th:id="${fieldName}"
+               th:field="*{__${fieldName}__}"
+               class="form-control form-control-lg"
+               th:classappend="${#fields.hasErrors(fieldName)} ? 'is-invalid' :
+                (${submitted} ? 'is-valid' : '')"
+               placeholder="John Doe">
+        <label th:for="${fieldName}" th:text="${labelName}">Naam input</label>
+        <span th:if="${#fields.hasErrors(fieldName)}"
+              th:errors="*{__${fieldName}__}"
+              class="invalid-feedback"></span>
+    </div>
+</body>
+</html>

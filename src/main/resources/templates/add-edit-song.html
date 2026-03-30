@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+
+<head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title>Nummer toevoegen of bewerken - SongScore</title>
-    <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
-    <h1>Nummer toevoegen/bewerken</h1>
+    <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
-    <form th:action="@{/song/save}" th:object="${song}" method="post">
-        <input type="hidden" th:field="*{id}">
-        <div>
-            <label for="title">Titel</label>
-            <input type="text" id="title" th:field="*{title}">
-            <span th:if="${#fields.hasErrors('title')}"
-                  th:errors="*{title}"
-                  class="error">
-            </span>
-        </div>
-        <div>
-            <label for="artists">Artiest(en)</label>
-            <select id="artists" th:field="*{artists}">
-                <option th:each="artist : ${allArtists}"
-                        th:value="${artist.id}"
-                        th:text="${artist.name}">
-                </option>
-            </select>
-        </div>
-        <div>
-            <label for="genre">Genre</label>
-            <input type="text" id="genre" th:field="*{genre}">
-            <span th:if="${#fields.hasErrors('genre')}"
-                  th:errors="*{genre}"
-                  class="error">
-            </span>
-        </div>
-        <div>
-            <label for="year">Jaar</label>
-            <input type="number" id="year" th:field="*{year}">
-            <span th:if="${#fields.hasErrors('year')}"
-                  th:errors="*{year}"
-                  class="error">
-            </span>
-        </div>
-        <button type="submit">Opslaan</button>
-    </form>
+    <div class="container">
+        <h1>Nummer toevoegen/bewerken</h1>
+            <form th:action="@{/song/save}" th:object="${song}" method="post">
+                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span th:each="error : ${#fields.globalErrors()}"
+                       th:text="${error}"></span>
+                </div>
+                <input type="hidden" th:field="*{id}">
+                <div th:replace="~{fragments/forms :: formField('title', 'Titel', 'text')}"></div>
+                <div class="mb-3 has-validation">
+                    <label for="artists"
+                           class="mb-1 text-secondary">Artiest(en)</label>
+                    <select id="artists"
+                            th:field="*{artists}"
+                            class="form-select form-select-lg"
+                            multiple
+                            size="6"
+                    >
+                        <option th:each="artist : ${allArtists}"
+                                th:value="${artist.id}"
+                                th:text="${artist.name}"
+                                class="">
+                        </option>
+                    </select>
+                    <div class="form-text">Houd 'ctrl' of 'cmd' ingedrukt om meerdere artiesten te selecteren.</div>
+                    <span th:if="${#fields.hasErrors('artists')}"
+                          th:errors="*{artists}"
+                          class="invalid-feedback d-block"></span>
+                </div>
+                <div th:replace="~{fragments/forms :: formField('genre', 'Genre', 'text')}"></div>
+                <div th:replace="~{fragments/forms :: formField('year', 'Jaar', 'number')}"></div>
 
+                <button type="submit">Opslaan</button>
+            </form>
+    </div>
+
+    <footer th:replace="~{/fragments/general :: footer}"></footer>
+
+    <div th:replace="~{/fragments/general :: scripts}"></div>
 </body>
 </html>

@@ -11,6 +11,8 @@ import nl.miwnn.ch19.mart.songscore.model.Rating;
 import nl.miwnn.ch19.mart.songscore.model.Song;
 import nl.miwnn.ch19.mart.songscore.repository.ArtistRepository;
 import nl.miwnn.ch19.mart.songscore.repository.SongRepository;
+import nl.miwnn.ch19.mart.songscore.service.ArtistService;
+import nl.miwnn.ch19.mart.songscore.service.SongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -27,19 +29,19 @@ import java.util.Optional;
 public class SongController {
 
     private static final Logger log = LoggerFactory.getLogger(SongController.class);
-    private final SongRepository songRepository;
-    private final ArtistRepository artistRepository;
+    private final SongService songService;
+    private final ArtistService artistService;
 
-    public SongController(SongRepository songRepository, ArtistRepository artistRepository) {
-        this.songRepository = songRepository;
-        this.artistRepository = artistRepository;
+    public SongController(SongService songService, ArtistService artistService) {
+        this.songService = songService;
+        this.artistService = artistService;
     }
 
     @GetMapping("/all")
     public String showSongOverview(
             @RequestParam(required = false) String query,
             Model model) {
-        List<Song> songs = songRepository.findAll();
+        List<Song> songs = songService.getAllSongs();
 
         log.debug("Song overview opgevraagd, {} songs opgehaald", songs.size());
 
@@ -66,21 +68,17 @@ public class SongController {
     public String showSongAddForm(Model model) {
         log.debug("Leeg nummerformulier opgevraagd");
         model.addAttribute("song", new Song());
-        model.addAttribute("allArtists", artistRepository.findAll());
+        model.addAttribute("allArtists", artistService.getAllArtists());
         return "add-edit-song";
     }
 
-    @GetMapping("/edit/{songId}")
-    public String showSongEditForm(@PathVariable Long songId, Model model) {
-        log.debug("Bewerkformulier opgevraagd voor: {}", songId);
+    @GetMapping("/edit/{artistName}/{title}")
+    public String showSongEditForm(@PathVariable String artistName, @PathVariable String title, Model model) {
+        log.debug("Bewerkformulier opgevraagd voor: {}", title);
+        Song songToEdit = songService.getSongByTitleAndArtist(title, artistName);
 
-        Optional<Song> songToEdit = songRepository.findById(songId);
-        if (songToEdit.isEmpty()) {
-            log.warn("Nummer met ID {} niet gevonden voor bewerking", songId);
-            return "redirect:/song/all";
-        }
         model.addAttribute("song", songToEdit);
-        model.addAttribute("allArtists", artistRepository.findAll());
+        model.addAttribute("allArtists", artistService.getAllArtists());
         return "add-edit-song";
     }
 
@@ -88,48 +86,44 @@ public class SongController {
     public String processAddSong(
             @Valid @ModelAttribute Song updatedSong,
             BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes) {
         log.info("Nummer opslaan: {}", updatedSong.getTitle());
 
+        if (songService.songAndArtistCombinationExists(updatedSong)) {
+                log.warn("Not updating song, combination of title and first artist already exists");
+                bindingResult.reject("alreadyExists",
+                        "Deze combinatie van titel en artiest bestaat al");
+            }
+
         if (bindingResult.hasErrors()) {
             log.warn("Validatiefouten bij opslaan: {}", bindingResult.getErrorCount());
+            model.addAttribute("allArtists", artistService.getAllArtists());
             return "add-edit-song";
         }
 
-        if (updatedSong.getRatings().isEmpty()) {
-            updatedSong.getRatings().add(new Rating(1, updatedSong));
-            updatedSong.getRatings().add(new Rating(3, updatedSong));
-            updatedSong.getRatings().add(new Rating(5, updatedSong));
-        }
-
-        songRepository.save(updatedSong);
-        log.info("Nieuw nummer toegevoegd: {}", updatedSong.getTitle());
+        songService.saveSong(updatedSong);
+        log.info("Nummer opgeslagen: {}", updatedSong.getTitle());
         redirectAttributes.addFlashAttribute(
-                "successMessage", "Nummer succesvol toegevoegd!");
+                "successMessage", "Nummer succesvol opgeslagen!");
         return "redirect:/song/all";
     }
 
-    @GetMapping("/delete/{songId}")
-    public String deleteSong(@PathVariable Long songId) {
-        log.info("Nummer verwijderd: {}", songId);
-        songRepository.deleteById(songId);
+    @GetMapping("/delete/{artistName}/{title}")
+    public String deleteSong(@PathVariable String artistName, @PathVariable String title) {
+        Song songToDelete = songService.getSongByTitleAndArtist(title, artistName);
+
+        log.info("Nummer verwijderd: {}, {}", title, artistName);
+        songService.deleteSong(songToDelete);
         return "redirect:/song/all";
     }
 
     @GetMapping("/{artistName}/{title}")
     public String showSongDetailPage(@PathVariable String artistName, @PathVariable String title, Model model) {
-        Artist firstArtist = artistRepository.findArtistByNameIgnoreCase(artistName)
-                .orElseThrow(() -> new IllegalArgumentException("Artist with given name not found"));
-        Optional<Song> song = songRepository.findSongByTitleAndArtistsContains(title, firstArtist);
+        Song song = songService.getSongByTitleAndArtist(title, artistName);
 
-        if (song.isEmpty()) {
-            log.warn("Detailpagina aangevraagd voor nummer met titel {}, niet gevonden", title);
-            return "redirect:/song/all";
-        }
-
-        log.debug("Detailpagina van het nummer {} aangevraagd", song.get().getTitle());
-
-        model.addAttribute("song", song.get());
+        log.debug("Detailpagina van het nummer {} aangevraagd", song.getTitle());
+        model.addAttribute("song", song);
         return "song-detail";
     }
 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
+    <title>Er ging iets mis</title>
+</head>
+<body>
+<nav th:replace="~{/fragments/general :: navbar}"></nav>
+
+<div class="container">
+    <h1>500 — Er ging iets mis</h1>
+    <p>Er is een onverwachte fout opgetreden.
+        Probeer het later opnieuw.</p>
+    <p th:if="${bericht != null}"
+       th:text="${bericht}"
+       style="color: gray; font-size: 0.9em;">
+        Foutmelding
+    </p>
+    <p>
+        <a th:href="@{/books}">Terug naar het boekoverzicht</a>
+    </p>
+</div>
+
+<footer th:replace="~{/fragments/general :: footer}"></footer>
+
+<div th:replace="~{/fragments/general :: scripts}"></div>
+</body>
+</html>
