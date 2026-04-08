@@ -1,0 +1,24 @@
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.rating input:checked ~ label i {
+    color: #ffc107;
+}
+
+.rating label:hover i,
+.rating label:hover ~ label i {
+    color: #ffc107;
+}

@@ -9,7 +9,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
+import java.time.LocalDateTime;
+
 @Entity
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = {"rater_id", "song_id"})
+)
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +22,18 @@ public class Rating {
 
     @Min(value = 1, message = "Waardering moet ten minste 1 zijn")
     @Max(value = 5, message = "Waardering mag hoogstens 5 zijn")
-    private int rateScore;
+    private Integer rateScore;
+
+    private String description;
 
     @ManyToOne
     private Song song;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private SongScoreUser rater;
+
+    private LocalDateTime placedAt;
 
     public Rating(int rateScore, Song song) {
         this.rateScore = rateScore;
@@ -37,12 +50,20 @@ public class Rating {
         this.id = id;
     }
 
-    public int getRateScore() {
+    public Integer getRateScore() {
         return rateScore;
     }
 
-    public void setRateScore(int rateScore) {
+    public void setRateScore(Integer rateScore) {
         this.rateScore = rateScore;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Song getSong() {
@@ -51,5 +72,21 @@ public class Rating {
 
     public void setSong(Song song) {
         this.song = song;
+    }
+
+    public SongScoreUser getRater() {
+        return rater;
+    }
+
+    public void setRater(SongScoreUser rater) {
+        this.rater = rater;
+    }
+
+    public LocalDateTime getPlacedAt() {
+        return placedAt;
+    }
+
+    public void setPlacedAt(LocalDateTime placedAt) {
+        this.placedAt = placedAt;
     }
 }

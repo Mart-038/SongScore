@@ -24,15 +24,9 @@
             </div>
         </div>
 
-
-        <div    th:if="${successMessage}"
-                class="alert alert-success mb-3">
-            <span th:text="${successMessage}">Opgeslagen!</span>
-        </div>
-
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <div class="col" th:each="song : ${songs}">
-                <a th:href="@{/song/{artistName}/{title}(artistName=${song.artists[0].name}, title=${song.title})}"
+                <a th:href="@{/song/detail/{artistName}/{title}(artistName=${song.artists[0].name}, title=${song.title})}"
                    class="text-decoration-none text-dark">
                     <div class="card">
                         <div class="card-body">

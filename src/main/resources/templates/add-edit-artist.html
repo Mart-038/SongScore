@@ -10,10 +10,20 @@
     <div class="container">
         <h1 class="display-5 mb-3">Artiest toevoegen of bewerken</h1>
 
-        <form th:action="@{/artist/save}" th:object="${artist}" method="post">
+        <form th:action="@{/artist/save}" th:object="${artistForm}"
+              method="post" enctype="multipart/form-data">
             <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{existingImageId}">
             <div th:replace="~{fragments/forms :: formField('name', 'Naam', 'text')}"></div>
             <div th:replace="~{fragments/forms :: formField('activeSince', 'Actief sinds', 'number')}"></div>
+            <div th:replace="~{fragments/forms :: formField('activeUntil', 'Actief tot', 'number')}"></div>
+            <div class="mb-3">
+                <label for="imageFile" class="form-label text-secondary mb-1">Foto van artiest</label>
+                <input type="file" id="imageFile"
+                       name="imageFile"
+                       accept="image/*"
+                       class="form-control form-control-lg text-secondary">
+            </div>
             <button type="submit"
                     class="btn btn-primary"
             >

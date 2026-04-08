@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:fragment="baseheader(title)">
     <meta charset="UTF-8">
@@ -9,10 +10,12 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}">
     <link rel="stylesheet" href="/css/Style.css">
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.ico}">
+    <link rel="stylesheet" href="/css/RatingForm.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary"
-         th:fragment="navbar">
+<th:block th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <img th:src="@{/images/songscore-logo.png}" alt="SongScore logo" width="36"
@@ -32,10 +35,41 @@
                     <a class="nav-link"
                        th:classappend="${activePage == 'artists'} ? 'active' : ''"
                        href="/artist/all">Artiesten</a>
+                    <a class="nav-link" sec:authorize="hasRole('ADMIN')"
+                       th:classappend="${activePage == 'users'} ? 'active' : ''"
+                       href="/user/all">Gebruikersbeheer</a>
                 </div>
+            </div>
+            <div class="flex-fill d-flex justify-content-end align-items-center">
+                <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+                    <button class="btn btn-outline-dark btn-sm">Uitloggen</button>
+                </form>
+                <a th:href="@{/login}" sec:authorize="isAnonymous()">
+                    <button class="btn btn-outline-dark btn-sm">Inloggen</button>
+                </a>
             </div>
         </div>
     </nav>
+
+    <div class="container mt-3">
+        <div th:if="${successMessage}"
+             class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            <span th:text="${successMessage}">Actie geslaagd.</span>
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Sluiten"></button>
+        </div>
+        <div th:if="${errorMessage}"
+             class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+            <span th:text="${errorMessage}">Er is een fout opgetreden.</span>
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Sluiten"></button>
+        </div>
+    </div>
+</th:block>
 
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
             th:fragment="footer">

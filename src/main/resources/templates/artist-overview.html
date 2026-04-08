@@ -8,11 +8,32 @@
     <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
     <div class="container">
-        <h1>Artiesten</h1>
+        <div>
+            <h1>Artiesten</h1>
+        </div>
 
-        <div    th:if="${successMessage}"
-                class="alert alert-success">
-            <span th:text="${successMessage}">Opgeslagen!</span>
+        <div class="row g-4">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex"
+                 th:each="artist : ${artists}"
+                 th:object="${artist}">
+                <a th:href="@{/artist/detail/{artistName}(artistName=*{name})}"
+                   class="text-decoration-none text-dark">
+                    <div class="card mb-3 w-100">
+                        <div class="ratio ratio-16x9">
+                            <img th:if="*{image != null}"
+                                 th:src="@{/image/{id}(id=*{image.id})}"
+                                 class="card-img-top object-fit-cover"
+                                 th:alt="*{name}">
+                        </div>
+                        <div class="card-body">
+                            <p th:text="*{name}" class="h5 card-title">Name</p>
+                            <p class="card-text">
+                                Hier kunnen later enkele bekende nummers of genres die deze artiest speelt komen.</p>
+                            <p class="card-text"><small th:text="*{activeSince}" class="text-body-secondary">Year founded</small></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
 
         <table>

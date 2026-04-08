@@ -6,13 +6,16 @@ package nl.miwnn.ch19.mart.songscore.controller;
  * */
 
 import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 @ControllerAdvice
 public class SongScoreExceptionHandler {
+
 
     @ExceptionHandler(EntityNotFoundException.class)
     public String handleNotFound(EntityNotFoundException entityNotFoundException, Model model) {
@@ -27,6 +30,13 @@ public class SongScoreExceptionHandler {
         model.addAttribute("statusCode",
                 exception.getStatusCode().value());
         model.addAttribute("errorMessage", exception.getReason());
+        return "error/404";
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public String handleFileUploadException(MultipartException exception,
+                                            Model model) {
+        model.addAttribute("errorMessage", exception.getMessage());
         return "error/404";
     }
 

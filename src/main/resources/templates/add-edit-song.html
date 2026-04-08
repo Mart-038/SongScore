@@ -16,29 +16,34 @@
                        th:text="${error}"></span>
                 </div>
                 <input type="hidden" th:field="*{id}">
-                <div th:replace="~{fragments/forms :: formField('title', 'Titel', 'text')}"></div>
-                <div class="mb-3 has-validation">
-                    <label for="artists"
-                           class="mb-1 text-secondary">Artiest(en)</label>
-                    <select id="artists"
-                            th:field="*{artists}"
-                            class="form-select form-select-lg"
-                            multiple
-                            size="6"
-                    >
-                        <option th:each="artist : ${allArtists}"
-                                th:value="${artist.id}"
-                                th:text="${artist.name}"
-                                class="">
-                        </option>
-                    </select>
-                    <div class="form-text">Houd 'ctrl' of 'cmd' ingedrukt om meerdere artiesten te selecteren.</div>
-                    <span th:if="${#fields.hasErrors('artists')}"
-                          th:errors="*{artists}"
-                          class="invalid-feedback d-block"></span>
+                <div class="row g-md-5 align-items-md-stretch">
+                    <div class="col-md d-flex flex-column">
+                        <div th:replace="~{fragments/forms :: formField('title', 'Titel', 'text')}"></div>
+                        <div th:replace="~{fragments/forms :: formField('genre', 'Genre', 'text')}"></div>
+                        <div th:replace="~{fragments/forms :: formField('year', 'Jaar', 'number')}"></div>
+                    </div>
+                    <div class="col-md d-flex flex-column">
+                        <div class="has-validation d-flex flex-column flex-grow-1">
+                            <label for="artists"
+                                   class="mb-1 text-secondary">Artiest(en)</label>
+                            <select id="artists"
+                                    th:field="*{artists}"
+                                    class="form-select form-select-lg flex-grow-1"
+                                    multiple
+                            >
+                                <option th:each="artist : ${allArtists}"
+                                        th:value="${artist.id}"
+                                        th:text="${artist.name}"
+                                        class="">
+                                </option>
+                            </select>
+                            <div class="form-text">Houd 'ctrl' of 'cmd' ingedrukt om meerdere artiesten te selecteren.</div>
+                            <span th:if="${#fields.hasErrors('artists')}"
+                                  th:errors="*{artists}"
+                                  class="invalid-feedback d-block"></span>
+                        </div>
+                    </div>
                 </div>
-                <div th:replace="~{fragments/forms :: formField('genre', 'Genre', 'text')}"></div>
-                <div th:replace="~{fragments/forms :: formField('year', 'Jaar', 'number')}"></div>
 
                 <button type="submit">Opslaan</button>
             </form>

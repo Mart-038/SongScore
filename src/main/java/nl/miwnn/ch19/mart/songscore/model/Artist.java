@@ -25,6 +25,13 @@ public class Artist {
     @Max(value = 2030, message = "Het jaar mag niet hoger dan {value} zijn")
     private Integer activeSince;
 
+    private Integer activeUntil;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
+
     public Artist() {
     }
 
@@ -50,5 +57,21 @@ public class Artist {
 
     public void setActiveSince(Integer activeSince) {
         this.activeSince = activeSince;
+    }
+
+    public Integer getActiveUntil() {
+        return activeUntil;
+    }
+
+    public void setActiveUntil(Integer activeUntil) {
+        this.activeUntil = activeUntil;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 }

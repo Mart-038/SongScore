@@ -9,12 +9,15 @@ import jakarta.validation.Valid;
 import nl.miwnn.ch19.mart.songscore.model.Artist;
 import nl.miwnn.ch19.mart.songscore.model.Rating;
 import nl.miwnn.ch19.mart.songscore.model.Song;
+import nl.miwnn.ch19.mart.songscore.model.SongScoreUser;
 import nl.miwnn.ch19.mart.songscore.repository.ArtistRepository;
 import nl.miwnn.ch19.mart.songscore.repository.SongRepository;
 import nl.miwnn.ch19.mart.songscore.service.ArtistService;
+import nl.miwnn.ch19.mart.songscore.service.RatingService;
 import nl.miwnn.ch19.mart.songscore.service.SongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,10 +34,14 @@ public class SongController {
     private static final Logger log = LoggerFactory.getLogger(SongController.class);
     private final SongService songService;
     private final ArtistService artistService;
+    private final RatingService ratingService;
 
-    public SongController(SongService songService, ArtistService artistService) {
+    public SongController(SongService songService,
+                          ArtistService artistService,
+                          RatingService ratingService) {
         this.songService = songService;
         this.artistService = artistService;
+        this.ratingService = ratingService;
     }
 
     @GetMapping("/all")
@@ -110,20 +117,38 @@ public class SongController {
     }
 
     @GetMapping("/delete/{artistName}/{title}")
-    public String deleteSong(@PathVariable String artistName, @PathVariable String title) {
+    public String deleteSong(@PathVariable String artistName,
+                             @PathVariable String title,
+                             RedirectAttributes redirectAttributes) {
         Song songToDelete = songService.getSongByTitleAndArtist(title, artistName);
 
         log.info("Nummer verwijderd: {}, {}", title, artistName);
         songService.deleteSong(songToDelete);
+        redirectAttributes.addFlashAttribute(
+                "successMessage", "Nummer succesvol verwijderd!");
         return "redirect:/song/all";
     }
 
-    @GetMapping("/{artistName}/{title}")
-    public String showSongDetailPage(@PathVariable String artistName, @PathVariable String title, Model model) {
+    @GetMapping("/detail/{artistName}/{title}")
+    public String showSongDetailPage(@PathVariable String artistName,
+                                     @PathVariable String title, Model model,
+                                     Authentication authentication) {
         Song song = songService.getSongByTitleAndArtist(title, artistName);
+
+        SongScoreUser currentUser = null;
+        boolean hasRatedSong = false;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            currentUser = (SongScoreUser) authentication.getPrincipal();
+            hasRatedSong = ratingService.raterAndSongCombinationAlreadyExists(song, currentUser);
+        }
+
 
         log.debug("Detailpagina van het nummer {} aangevraagd", song.getTitle());
         model.addAttribute("song", song);
+        model.addAttribute("newRating", new Rating());
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("hasRated", hasRatedSong);
         return "song-detail";
     }
 

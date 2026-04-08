@@ -11,9 +11,9 @@ import nl.miwnn.ch19.mart.songscore.model.Song;
 import nl.miwnn.ch19.mart.songscore.repository.ArtistRepository;
 import nl.miwnn.ch19.mart.songscore.repository.SongRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,10 +31,16 @@ public class SongService {
         return songRepository.findAll();
     }
 
-    public Optional<Song> getSongById(Long id) {
-        return songRepository.findById(id);
+    public Song getSongById(Long id) {
+        Optional<Song> optionalSong = songRepository.findById(id);
+        if (optionalSong.isEmpty()) {
+            throw new EntityNotFoundException(String.format("Nummer met id %d kon niet gevonden worden.", id));
+        }
+
+        return optionalSong.get();
     }
 
+    @Transactional(readOnly = true)
     public Song getSongByTitleAndArtist(String title, String artistName) {
         Artist firstArtist = artistRepository.findArtistByNameIgnoreCase(artistName)
                 .orElseThrow(() -> new IllegalArgumentException("Artist with given name not found"));
@@ -48,6 +54,7 @@ public class SongService {
         return optionalSong.get();
     }
 
+    @Transactional(readOnly = true)
     public boolean songAndArtistCombinationExists(Song updatedSong) {
         if (updatedSong.getArtists().isEmpty()) {
             return false;
@@ -60,9 +67,7 @@ public class SongService {
             return existsByTitleAndArtist(updatedSong, firstArtist);
         }
 
-        Song existingSong = getSongById(updatedSong.getId()).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Geen nummer in database gevonden met ID: %s",
-                        updatedSong.getId())));
+        Song existingSong = getSongById(updatedSong.getId());
 
         // Als titel en artiest hetzelfde blijven, mag dit gewoon
         if (sameTitleAndSameArtist(updatedSong, existingSong)) {

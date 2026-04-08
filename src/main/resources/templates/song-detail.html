@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title th:text="|Details van ${song.title}|">Detailpagina</title>
@@ -15,18 +16,18 @@
                 <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artists[0].name}">artiest</span>
                     in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
             </div>
-            <div class="col">
+            <div class="col" sec:authorize="hasAnyRole('ADMIN', 'USER')">
                 <div class="gap-2 justify-content-center pb-5">
                     <a th:href="@{/song/edit/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
-                        <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
-                            <i class="bi bi-pencil-square"></i>
+                        <button class="btn btn-primary rounded-1 p-3 lh-1" type="button">
+                            <i class="bi bi-pencil-square"></i> Bewerken
                         </button>
                     </a>
                 </div>
-                <div class="gap-2 justify-content-center pb-5">
+                <div class="gap-2 justify-content-center pb-5" sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/song/delete/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
-                        <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
-                            <i class="bi bi-trash"></i>
+                        <button class="btn btn-primary rounded-1 p-3 lh-1" type="button">
+                            <i class="bi bi-trash"></i> Verwijderen
                         </button>
                     </a>
                 </div>
@@ -35,8 +36,55 @@
 
         <div>
             <h2>Ratings</h2>
+            <div class="list-group">
+                <div class="list-group-item" th:if="${!hasRated}" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/rating/song/{songId}/save(songId=${song.id})}"
+                          th:object="${newRating}" method="post">
+                        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span th:each="error : ${#fields.globalErrors()}"
+                                  th:text="${error}"></span>
+                        </div>
+                        <div class="form-text">
+                            Geef een waardering tussen de 1 en 5 en geef eventueel een beschrijving mee
+                        </div>
+                        <div class="rating">
+                            <input type="radio" id="star5" name="rateScore" value="5" th:field="*{rateScore}">
+                            <label for="star5"><i class="bi bi-star-fill"></i></label>
+                            <input type="radio" id="star4" name="rateScore" value="4" th:field="*{rateScore}">
+                            <label for="star4"><i class="bi bi-star-fill"></i></label>
+                            <input type="radio" id="star3" name="rateScore" value="3" th:field="*{rateScore}">
+                            <label for="star3"><i class="bi bi-star-fill"></i></label>
+                            <input type="radio" id="star2" name="rateScore" value="2" th:field="*{rateScore}">
+                            <label for="star2"><i class="bi bi-star-fill"></i></label>
+                            <input type="radio" id="star1" name="rateScore" value="1" th:field="*{rateScore}">
+                            <label for="star1"><i class="bi bi-star-fill"></i></label>
+                        </div>
+                        <div th:replace="~{fragments/forms :: formField('description', 'Beschrijving', 'text')}"></div>
+                        <button type="submit">Insturen</button>
+                    </form>
+                </div>
+                <div th:each="rating : ${song.ratings}" class="list-group-item">
+                    <h1>
+                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                            <i th:class="${i <= rating.getRateScore()} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
+                        </span>
+                    </h1>
+                    <p th:if="${rating.description}" th:text="${rating.description}">Beschrijving</p>
+                    <p th:text="${rating.rater.username}">Gebruiker</p>
+                    <a sec:authorize="isAuthenticated()"
+                       th:if="${rating.rater.username == #authentication?.getName()}"
+                       th:href="@{/rating/delete/{ratingId}(ratingId=${rating.getId()})}"
+                       class="btn btn-primary rounded-1 p-3 lh-1">
+                            <i class="bi bi-trash"></i> Verwijderen
+                    </a>
+                </div>
+            </div>
             <ul>
-                <li th:each="rating : ${song.ratings}" th:text="${rating.rateScore}"></li>
+                <li th:each="rating : ${song.ratings}">
+                    <span th:text="${rating.rateScore}"></span>
+                    <span th:text="${rating.rater.getUsername()}"></span>
+                </li>
             </ul>
         </div>
     </div>
