@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 
 <head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title>Artiestenoverzicht</title>
@@ -34,6 +36,17 @@
                     </div>
                 </a>
             </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex" sec:authorize="hasRole('ADMIN')">
+                <div class="card mb-3 w-100">
+                    <div class="card-body">
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary"
+                                data-bs-toggle="modal" data-bs-target="#newArtistModal">
+                            Nieuwe artiest toevoegen
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <table>
@@ -59,8 +72,41 @@
         <a th:href="@{/artist/add}">Artiest toevoegen</a>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="newArtistModal" tabindex="-1" aria-hidden="true" sec:authorize="hasRole('ADMIN')">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div th:replace="~{fragments/forms :: formArtist(${artistForm}, 'addAuthorForm')}"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <button type="submit"
+                            form="addAuthorForm"
+                            class="btn btn-primary">
+                        Opslaan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer th:replace="~{/fragments/general :: footer}"></footer>
 
     <div th:replace="~{/fragments/general :: scripts}"></div>
+
+    <th:block th:if="${showNewArtistModal}">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = new bootstrap.Modal(document.getElementById('newArtistModal'));
+                modal.show();
+            })
+        </script>
+    </th:block>
+
 </body>
 </html>

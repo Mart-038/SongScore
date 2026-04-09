@@ -2,10 +2,32 @@
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
 
 <body>
+<!--Form om een auteur op te slaan-->
+    <form th:fragment="formArtist(artistForm, formId)"
+          th:action="@{/artist/save}"
+          th:object="${artistForm}"
+          th:id="${formId}"
+          method="post"
+          enctype="multipart/form-data">
+<!--        /*@thymesVar id="artistForm" type="nl.miwnn.ch19.mart.songscore.dto.ArtistFormDTO"*/-->
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{existingImageId}">
+        <div th:replace="~{:: formField('name', 'Naam', 'text')}"></div>
+        <div th:replace="~{:: formField('activeSince', 'Actief sinds', 'number')}"></div>
+        <div th:replace="~{:: formField('activeUntil', 'Actief tot', 'number')}"></div>
+        <div class="mb-3">
+            <label for="imageFile" class="form-label text-secondary mb-1">Foto van artiest</label>
+            <input type="file" id="imageFile"
+                   name="imageFile"
+                   accept="image/*"
+                   class="form-control form-control-lg text-secondary">
+        </div>
+    </form>
+
+<!--Een input field voor een form-->
     <div th:fragment="formField(fieldName, labelName, type)"
          th:with="submitted=${#fields.hasErrors('*')}"
-         class="form-floating mb-3 has-validation"
-    >
+         class="form-floating mb-3 has-validation">
         <input th:type="${type}"
                th:id="${fieldName}"
                th:field="*{__${fieldName}__}"

@@ -41,6 +41,7 @@ public class ArtistController {
         log.debug("Showing artist overview");
         List<Artist> artists = artistService.getAllArtists();
         model.addAttribute("artists", artists);
+        model.addAttribute("artistForm", new ArtistFormDTO());
         model.addAttribute("activePage", "artists");
         return "artist-overview";
     }
@@ -63,10 +64,11 @@ public class ArtistController {
     }
 
     @PostMapping("/save")
-    public String processAddArtist(@Valid @ModelAttribute ArtistFormDTO artistForm,
+    public String processAddArtist(@Valid @ModelAttribute("artistForm") ArtistFormDTO artistForm,
                                    BindingResult bindingResult,
                                    @RequestParam("imageFile") MultipartFile imageFile,
-                                  RedirectAttributes redirectAttributes) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         log.info("Artiest opslaan: {}", artistForm.getName());
 
         if (artistService.artistNameAlreadyInUse(artistForm.getName(), artistForm.getId())) {
@@ -79,7 +81,10 @@ public class ArtistController {
 
         if (bindingResult.hasErrors()) {
             log.warn("Validatiefouten bij opslaan artiest: {}", bindingResult.getErrorCount());
-            return "add-edit-artist";
+            List<Artist> artists = artistService.getAllArtists();
+            model.addAttribute("artists", artists);
+            model.addAttribute("showNewArtistModal", true);
+            return "artist-overview";
         }
 
         artistService.saveArtist(artistForm, imageFile);
