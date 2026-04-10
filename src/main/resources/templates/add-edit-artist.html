@@ -10,7 +10,15 @@
     <div class="container">
         <h1 class="display-5 mb-3">Artiest toevoegen of bewerken</h1>
 
-        <form th:replace="~{fragments/forms :: formArtist(artistForm)}"></form>
+        <form th:replace="~{fragments/forms :: formArtist(artistForm, 'editArtistForm')}"></form>
+        <div>
+            <a onclick="history.back()" class="btn btn-secondary" >Annuleren</a>
+            <button type="submit"
+                    form="editArtistForm"
+                    class="btn btn-primary">
+                Opslaan
+            </button>
+        </div>
     </div>
 
     <footer th:replace="~{/fragments/general :: footer}"></footer>

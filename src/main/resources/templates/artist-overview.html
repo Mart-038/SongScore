@@ -31,7 +31,13 @@
                             <p th:text="*{name}" class="h5 card-title">Name</p>
                             <p class="card-text">
                                 Hier kunnen later enkele bekende nummers of genres die deze artiest speelt komen.</p>
-                            <p class="card-text"><small th:text="*{activeSince}" class="text-body-secondary">Year founded</small></p>
+                            <p class="card-text">
+                                <small class="text-body-secondary">
+                                    <span th:text="${artist.activeSince}">Year founded</span>
+                                    <span th:if="${artist.activeUntil}" th:text="| - ${artist.activeUntil}|"></span>
+                                    <span th:unless="${artist.activeUntil}"> - heden</span>
+                                </small>
+                            </p>
                         </div>
                     </div>
                 </a>
@@ -81,12 +87,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div th:replace="~{fragments/forms :: formArtist(${artistForm}, 'addAuthorForm')}"></div>
+                    <div th:replace="~{fragments/forms :: formArtist(${artistForm}, 'addArtistForm')}"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
                     <button type="submit"
-                            form="addAuthorForm"
+                            form="addArtistForm"
                             class="btn btn-primary">
                         Opslaan
                     </button>

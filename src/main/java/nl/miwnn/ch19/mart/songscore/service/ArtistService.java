@@ -24,14 +24,14 @@ public class ArtistService {
 
     private final ArtistRepository artistRepository;
     private final ArtistMapper artistMapper;
-    private final ImageRepository imageRepository;
+    private final ImageService imageService;
 
     public ArtistService(ArtistRepository artistRepository,
                          ArtistMapper artistMapper,
-                         ImageRepository imageRepository) {
+                         ImageService imageService) {
         this.artistRepository = artistRepository;
         this.artistMapper = artistMapper;
-        this.imageRepository = imageRepository;
+        this.imageService = imageService;
     }
 
     public List<Artist> getAllArtists() {
@@ -79,15 +79,7 @@ public class ArtistService {
         artist = artistMapper.toArtist(artistForm, artist);
 
         if (!imageFile.isEmpty()) {
-            Image image = new Image();
-            try {
-                image.setData(imageFile.getBytes());
-            } catch (IOException ioException) {
-                throw new IllegalStateException("Dit bestand kon niet worden opgeslagen", ioException);
-            }
-            image.setContentType(imageFile.getContentType());
-            imageRepository.save(image);
-            artist.setImage(image);
+            artist.setImage(imageService.saveImage(imageFile, "artistImage"));
         }
         artistRepository.save(artist);
     }

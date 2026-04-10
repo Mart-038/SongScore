@@ -5,7 +5,6 @@ package nl.miwnn.ch19.mart.songscore.dto;
  * Supports new/edit artist form
  * */
 
-import nl.miwnn.ch19.mart.songscore.model.Image;
 
 public class ArtistFormDTO {
 

@@ -2,27 +2,25 @@
 <html lang="nl" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-<!--Form om een auteur op te slaan-->
-    <form th:fragment="formArtist(artistForm, formId)"
+
+<!--Form to save an Artist-->
+<form th:fragment="formArtist(artistForm, formId)"
           th:action="@{/artist/save}"
           th:object="${artistForm}"
           th:id="${formId}"
           method="post"
-          enctype="multipart/form-data">
-<!--        /*@thymesVar id="artistForm" type="nl.miwnn.ch19.mart.songscore.dto.ArtistFormDTO"*/-->
+enctype="multipart/form-data">
+<!--    /*@thymesVar id="artistForm" type="nl.miwnn.ch19.mart.songscore.dto.ArtistFormDTO" */-->
         <input type="hidden" th:field="*{id}">
         <input type="hidden" th:field="*{existingImageId}">
         <div th:replace="~{:: formField('name', 'Naam', 'text')}"></div>
         <div th:replace="~{:: formField('activeSince', 'Actief sinds', 'number')}"></div>
         <div th:replace="~{:: formField('activeUntil', 'Actief tot', 'number')}"></div>
-        <div class="mb-3">
-            <label for="imageFile" class="form-label text-secondary mb-1">Foto van artiest</label>
-            <input type="file" id="imageFile"
-                   name="imageFile"
-                   accept="image/*"
-                   class="form-control form-control-lg text-secondary">
-        </div>
+        <div th:replace="~{:: formFileField('Foto van artiest')}"></div>
     </form>
+
+<!--Form to save a Song-->
+
 
 <!--Een input field voor een form-->
     <div th:fragment="formField(fieldName, labelName, type)"
@@ -39,6 +37,17 @@
         <span th:if="${#fields.hasErrors(fieldName)}"
               th:errors="*{__${fieldName}__}"
               class="invalid-feedback"></span>
+    </div>
+
+<!--An input field for a file-->
+    <div th:fragment="formFileField(labelName)"
+         class="mb-3">
+        <label for="imageFile" class="form-label text-secondary mb-1" th:text="${labelName}">File upload</label>
+        <input type="file" id="imageFile"
+               name="imageFile"
+               accept="image/*"
+               onchange="if(typeof onUploadChosen === 'function') onUploadChosen()"
+               class="form-control form-control-lg text-secondary">
     </div>
 </body>
 </html>

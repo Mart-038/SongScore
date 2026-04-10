@@ -20,6 +20,8 @@ public class Image {
 
     private String contentType;
 
+    private String imageType;
+
     public Long getId() {
         return id;
     }
@@ -42,5 +44,13 @@ public class Image {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
     }
 }

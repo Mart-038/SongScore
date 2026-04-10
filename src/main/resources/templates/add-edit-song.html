@@ -9,48 +9,94 @@
 
     <div class="container">
         <h1>Nummer toevoegen/bewerken</h1>
-            <form th:action="@{/song/save}" th:object="${song}" method="post">
-                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span th:each="error : ${#fields.globalErrors()}"
-                       th:text="${error}"></span>
-                </div>
-                <input type="hidden" th:field="*{id}">
-                <div class="row g-md-5 align-items-md-stretch">
-                    <div class="col-md d-flex flex-column">
-                        <div th:replace="~{fragments/forms :: formField('title', 'Titel', 'text')}"></div>
-                        <div th:replace="~{fragments/forms :: formField('genre', 'Genre', 'text')}"></div>
-                        <div th:replace="~{fragments/forms :: formField('year', 'Jaar', 'number')}"></div>
+        <form th:action="@{/song/save}" th:object="${songForm}"
+              method="post" enctype="multipart/form-data">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span th:each="error : ${#fields.globalErrors()}"
+                   th:text="${error}"></span>
+            </div>
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{existingImageId}">
+            <div class="row g-md-5 align-items-md-stretch">
+                <div class="col-md d-flex flex-column">
+                    <div th:replace="~{fragments/forms :: formField('title', 'Titel', 'text')}"></div>
+                    <div th:replace="~{fragments/forms :: formField('genre', 'Genre', 'text')}"></div>
+                    <div th:replace="~{fragments/forms :: formField('year', 'Jaar', 'number')}"></div>
+                    <button class="btn btn-primary" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#existingAlbumCoverOffcanvas"
+                            aria-controls="existingAlbumCoverOffcanvas">
+                        Bestaande album cover gebruiken
+                    </button>
+                    <div class="image-picker">
+
                     </div>
-                    <div class="col-md d-flex flex-column">
-                        <div class="has-validation d-flex flex-column flex-grow-1">
-                            <label for="artists"
-                                   class="mb-1 text-secondary">Artiest(en)</label>
-                            <select id="artists"
-                                    th:field="*{artists}"
-                                    class="form-select form-select-lg flex-grow-1"
-                                    multiple
-                            >
-                                <option th:each="artist : ${allArtists}"
-                                        th:value="${artist.id}"
-                                        th:text="${artist.name}"
-                                        class="">
-                                </option>
-                            </select>
-                            <div class="form-text">Houd 'ctrl' of 'cmd' ingedrukt om meerdere artiesten te selecteren.</div>
-                            <span th:if="${#fields.hasErrors('artists')}"
-                                  th:errors="*{artists}"
-                                  class="invalid-feedback d-block"></span>
+                    <div th:replace="~{fragments/forms :: formFileField('Album cover')}"></div>
+                </div>
+                <div class="col-md d-flex flex-column">
+                    <div class="has-validation d-flex flex-column flex-grow-1">
+                        <label for="artists"
+                               class="mb-1 text-secondary">Artiest(en)</label>
+                        <select id="artists"
+                                th:field="*{artistIds}"
+                                class="form-select form-select-lg flex-grow-1"
+                                multiple
+                        >
+                            <option th:each="artist : ${allArtists}"
+                                    th:value="${artist.id}"
+                                    th:text="${artist.name}"
+                                    class="">
+                            </option>
+                        </select>
+                        <div class="form-text">Houd 'ctrl' of 'cmd' ingedrukt om meerdere artiesten te selecteren.</div>
+                        <span th:if="${#fields.hasErrors('artistIds')}"
+                              th:errors="*{artistIds}"
+                              class="invalid-feedback d-block"></span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Opslaan</button>
+
+            <div class="offcanvas offcanvas-start"
+                 tabindex="-1"
+                 id="existingAlbumCoverOffcanvas"
+                 aria-labelledby="existingAlbumCoverOffcanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Album cover selecteren</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div class="row row-cols-3 g-2">
+                        <div th:each="albumCover : ${albumCovers}"
+                             class="image-option"
+                             th:data-id="${albumCover.id}"
+                             onclick="selectExistingImage(this)">
+                            <img th:src="@{/image/{id}(id=${albumCover.id})}"
+                                 alt="Album cover"
+                                 class="img-fluid rounded-3"
+                                 th:classappend="${albumCover.id == songForm.existingImageId} ? ' selected'">
                         </div>
                     </div>
                 </div>
-
-                <button type="submit">Opslaan</button>
-            </form>
+            </div>
+        </form>
     </div>
 
     <footer th:replace="~{/fragments/general :: footer}"></footer>
 
     <div th:replace="~{/fragments/general :: scripts}"></div>
+    <script>
+        function selectExistingImage(existingImage) {
+            document.querySelectorAll('.image-option img').forEach(option => option.classList.remove('selected'));
+            existingImage.querySelector('img').classList.add('selected');
+            document.getElementById('existingImageId').value = existingImage.dataset.id;
+            document.querySelector('input[name="imageFile"]').value = '';
+        }
+
+        function onUploadChosen() {
+            document.querySelectorAll('.image-option img').forEach(option => option.classList.remove('selected'));
+        }
+    </script>
 </body>
 </html>

@@ -1,3 +1,16 @@
 .active {
     font-weight: bold;
 }
+
+.image-option {
+    cursor: pointer;
+}
+
+.image-option img{
+    border: 3px solid transparent;
+    transition: border-color 0.15s;
+}
+
+.image-option img.selected {
+    border-color: #c0714a;
+}
