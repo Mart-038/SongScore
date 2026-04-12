@@ -20,6 +20,9 @@ public class Artist {
     @Column(unique = true)
     private String name;
 
+    @Size(max = 250, message = "De omschrijving mag niet meer dan {max} tekens bevatten")
+    private String bio;
+
     @NotNull(message = "Het jaar mag niet leeg zijn")
     @Min(value = 1000, message = "Het jaar mag niet lager dan {value} zijn")
     @Max(value = 2030, message = "Het jaar mag niet hoger dan {value} zijn")
@@ -49,6 +52,14 @@ public class Artist {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public Integer getActiveSince() {

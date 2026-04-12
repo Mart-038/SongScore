@@ -8,6 +8,7 @@ package nl.miwnn.ch19.mart.songscore.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Geef een waardering op")
     @Min(value = 1, message = "Waardering moet ten minste 1 zijn")
     @Max(value = 5, message = "Waardering mag hoogstens 5 zijn")
     private Integer rateScore;

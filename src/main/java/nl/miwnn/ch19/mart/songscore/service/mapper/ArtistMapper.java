@@ -15,6 +15,7 @@ public class ArtistMapper {
         ArtistFormDTO dto = new ArtistFormDTO();
         dto.setId(artist.getId());
         dto.setName(artist.getName());
+        dto.setBio(artist.getBio());
         dto.setActiveSince(artist.getActiveSince());
         dto.setActiveUntil(artist.getActiveUntil());
 
@@ -27,6 +28,7 @@ public class ArtistMapper {
 
     public Artist toArtist(ArtistFormDTO dto, Artist artist) {
         artist.setName(dto.getName());
+        artist.setBio(dto.getBio());
         artist.setActiveSince(dto.getActiveSince());
         artist.setActiveUntil(dto.getActiveUntil());
 

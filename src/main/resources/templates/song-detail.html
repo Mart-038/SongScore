@@ -8,84 +8,149 @@
 <body>
     <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
-    <div class="container">
-        <h1 th:text="${song.title}">Detailpagina</h1>
+    <div class="container-lg py-5">
 
-        <div class="row">
-            <div class="col">
-                <p>Dit nummer wordt uitgevoerd door <span th:text="${song.artists[0].name}">artiest</span>
-                    in <span th:text="${song.year}"></span> is van het genre <span th:text="${song.genre}"></span> </p>
-            </div>
-            <div class="col" sec:authorize="hasAnyRole('ADMIN', 'USER')">
-                <div class="gap-2 justify-content-center pb-5">
-                    <a th:href="@{/song/edit/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
-                        <button class="btn btn-primary rounded-1 p-3 lh-1" type="button">
-                            <i class="bi bi-pencil-square"></i> Bewerken
-                        </button>
-                    </a>
+        <div class="d-flex flex-column flex-md-row gap-4 align-items-start align-items-md-end mb-5">
+
+            <div class="col-6 col-sm-4 flex-shrink-0">
+                <div class="ratio ratio-1x1">
+                    <img th:if="${song.albumCover}"
+                         th:src="@{/image/{id}(id=${song.albumCover.getId()})}"
+                         th:alt="${song.title}"
+                         class="song-cover rounded shadow-sm flex-shrink-0"/>
+                    <div th:unless="${song.albumCover}"
+                         class="song-cover rounded bg-light border d-flex align-items-center
+                                justify-content-center flex-shrink-0 text-secondary">
+                        <i class="bi bi-music-note-beamed fs-1"></i>
+                    </div>
                 </div>
-                <div class="gap-2 justify-content-center pb-5" sec:authorize="hasRole('ADMIN')">
-                    <a th:href="@{/song/delete/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
-                        <button class="btn btn-primary rounded-1 p-3 lh-1" type="button">
-                            <i class="bi bi-trash"></i> Verwijderen
-                        </button>
+            </div>
+
+            <div class="flex-grow-1">
+                <p class="text-uppercase text-muted small fw-semibold mb-1">Nummer</p>
+                <h1 class="display-5 fw-semibold mb-3" th:text="${song.title}">Titel</h1>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge rounded-pill text-bg-warning fs-6 fw-normal"
+                          th:text="${song.genre}">Genre</span>
+                    <span class="badge rounded-pill text-bg-secondary fs-6 fw-normal"
+                          th:text="${song.year}">Year</span>
+                </div>
+
+                <p class="text-uppercase text-muted small fw-semibold mb-2">Artiesten</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <span th:each="artist : ${song.artists}"
+                          class="d-inline-flex align-items-center gap-2 border rounded-pill px-3 py-1 bg-light">
+                        <a th:href="@{artist/detail/{artistName}(artistName=${artist.name})}"
+                           class="text-decoration-none text-dark">
+                            <span class="small" th:text="${artist.name}">Artiest</span>
+                        </a>
+                    </span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2" sec:authorize="hasRole('ADMIN')">
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{/song/edit/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
+                        <i class="bi bi-pencil-square me-1"></i>Bewerken
+                    </a>
+                    <a class="btn btn-outline-danger btn-sm"
+                       th:href="@{/song/delete/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}">
+                        <i class="bi bi-trash me-1"></i>Verwijderen
                     </a>
                 </div>
             </div>
         </div>
 
-        <div>
-            <h2>Ratings</h2>
-            <div class="list-group">
-                <div class="list-group-item" th:if="${!hasRated}" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/rating/song/{songId}/save(songId=${song.id})}"
-                          th:object="${newRating}" method="post">
-                        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <span th:each="error : ${#fields.globalErrors()}"
-                                  th:text="${error}"></span>
+        <hr class="mb-4">
+
+
+
+
+
+        <div class="col-lg">
+            <p class="text-uppercase text-muted small fw-semibold mb-3">Beoordelingen</p>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card mb-3"
+                         th:if="${!hasRated}"
+                         sec:authorize="isAuthenticated()">
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                Geef een waardering tussen de 1 en 5 sterren en voeg eventueel een beschrijving toe
+                            </p>
+                            <form th:action="@{/rating/song/{songId}/save(songId=${song.id})}"
+                                  th:object="${newRating}" method="post">
+                                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger py-2 small">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                    <span th:each="error : ${#fields.globalErrors()}"
+                                          th:text="${error}"></span>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <div class="rating mb-3 me-3">
+                                        <input type="radio" id="star5" name="rateScore" value="5" th:field="*{rateScore}"
+                                        th:classappend="${#fields.hasErrors('rateScore')} ? 'is-invalid'">
+                                        <label for="star5"><i class="bi bi-star-fill"></i></label>
+                                        <input type="radio" id="star4" name="rateScore" value="4" th:field="*{rateScore}"
+                                        th:classappend="${#fields.hasErrors('rateScore')} ? 'is-invalid'">
+                                        <label for="star4"><i class="bi bi-star-fill"></i></label>
+                                        <input type="radio" id="star3" name="rateScore" value="3" th:field="*{rateScore}"
+                                        th:classappend="${#fields.hasErrors('rateScore')} ? 'is-invalid'">
+                                        <label for="star3"><i class="bi bi-star-fill"></i></label>
+                                        <input type="radio" id="star2" name="rateScore" value="2" th:field="*{rateScore}"
+                                        th:classappend="${#fields.hasErrors('rateScore')} ? 'is-invalid'">
+                                        <label for="star2"><i class="bi bi-star-fill"></i></label>
+                                        <input type="radio" id="star1" name="rateScore" value="1" th:field="*{rateScore}"
+                                        th:classappend="${#fields.hasErrors('rateScore')} ? 'is-invalid'">
+                                        <label for="star1"><i class="bi bi-star-fill"></i></label>
+                                    </div>
+                                    <span th:if="${#fields.hasErrors('rateScore')}"
+                                          th:errors="*{rateScore}"
+                                          class="invalid-feedback alert alert-danger py-2 small d-inline-block w-auto"></span>
+                                </div>
+                                <div th:replace="~{fragments/forms :: formField('description', 'Beschrijving', 'text')}"></div>
+                                <button type="submit" class="btn btn-primary btn-sm mt-1">Insturen</button>
+                            </form>
                         </div>
-                        <div class="form-text">
-                            Geef een waardering tussen de 1 en 5 en geef eventueel een beschrijving mee
-                        </div>
-                        <div class="rating">
-                            <input type="radio" id="star5" name="rateScore" value="5" th:field="*{rateScore}">
-                            <label for="star5"><i class="bi bi-star-fill"></i></label>
-                            <input type="radio" id="star4" name="rateScore" value="4" th:field="*{rateScore}">
-                            <label for="star4"><i class="bi bi-star-fill"></i></label>
-                            <input type="radio" id="star3" name="rateScore" value="3" th:field="*{rateScore}">
-                            <label for="star3"><i class="bi bi-star-fill"></i></label>
-                            <input type="radio" id="star2" name="rateScore" value="2" th:field="*{rateScore}">
-                            <label for="star2"><i class="bi bi-star-fill"></i></label>
-                            <input type="radio" id="star1" name="rateScore" value="1" th:field="*{rateScore}">
-                            <label for="star1"><i class="bi bi-star-fill"></i></label>
-                        </div>
-                        <div th:replace="~{fragments/forms :: formField('description', 'Beschrijving', 'text')}"></div>
-                        <button type="submit">Insturen</button>
-                    </form>
-                </div>
-                <div th:each="rating : ${song.ratings}" class="list-group-item">
-                    <h1>
-                        <span th:each="i : ${#numbers.sequence(1, 5)}">
-                            <i th:class="${i <= rating.getRateScore()} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
-                        </span>
-                    </h1>
-                    <p th:if="${rating.description}" th:text="${rating.description}">Beschrijving</p>
-                    <p th:text="${rating.rater.username}">Gebruiker</p>
-                    <a sec:authorize="isAuthenticated()"
-                       th:if="${rating.rater.username == #authentication?.getName()}"
-                       th:href="@{/rating/delete/{ratingId}(ratingId=${rating.getId()})}"
-                       class="btn btn-primary rounded-1 p-3 lh-1">
-                            <i class="bi bi-trash"></i> Verwijderen
-                    </a>
+                    </div>
                 </div>
             </div>
-            <ul>
-                <li th:each="rating : ${song.ratings}">
-                    <span th:text="${rating.rateScore}"></span>
-                    <span th:text="${rating.rater.getUsername()}"></span>
-                </li>
-            </ul>
+            <div class="row g-2">
+                <div th:each="rating : ${song.ratings}"
+                     class="col-12 col-md-6">
+                    <div class="card h-100">
+
+                        <div class="card-body pt-3 pb-1">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="badge rounded-circle bg-primary-subtle text-primary
+                                d-flex fw-semibold align-items-center justify-content-center"
+                                         style="width: 2rem; height: 2rem; font-size: 0.8rem;"
+                                         th:text="${#strings.toUpperCase(#strings.substring(rating.rater.username, 0, 2))}">
+                                        AB
+                                    </div>
+                                    <span class="fw-semibold" th:text="${rating.rater.username}">Gebruiker</span>
+                                </div>
+                                <span>
+                        <i th:each="i : ${#numbers.sequence(1, 5)}"
+                           th:class="${i <= rating.getRateScore()} ? 'bi bi-star-fill text-warning fs-5' :
+                                            'bi bi-star text-warning fs-5'"></i>
+                        </span>
+                            </div>
+                        </div>
+                        <p th:if="${rating.description}"
+                           th:text="${rating.description}"
+                           class="text-muted small mb-3 mx-3">Beschrijving</p>
+                        <div th:if="${rating.rater.username == #authentication?.getName()}"
+                             sec:authorize="isAuthenticated()"
+                             class="d-flex justify-content-end border-top pt-2 mt-1">
+                            <a th:href="@{/rating/delete/{ratingId}(ratingId=${rating.getId()})}"
+                               class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Verwijderen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

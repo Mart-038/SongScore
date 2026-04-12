@@ -10,6 +10,7 @@ public class ArtistFormDTO {
 
     private Long id;
     private String name;
+    private String bio;
     private Integer activeSince;
     private Integer activeUntil;
     private Long existingImageId;
@@ -28,6 +29,14 @@ public class ArtistFormDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public Integer getActiveSince() {

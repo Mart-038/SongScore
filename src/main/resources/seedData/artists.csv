@@ -1,11 +1,18 @@
-name,activeSince
-The Beatles,1960
-Pink Floyd,1965
-David Bowie,1962
-Queen,1970
-Michael Jackson,1964
-Madonna,1979
-Radiohead,1985
-Coldplay,1996
-Adele,2006
-Ed Sheeran,2005
+name,activeSince,activeUntil,bio
+The Beatles,1960,1970,"Legendarische Britse rockband uit Liverpool die de popmuziek voor altijd veranderde met hits als Hey Jude en Let It Be."
+Pink Floyd,1965,2014,"Britse rockband bekend om hun psychedelische en progressieve geluid, met meesterwerken zoals The Dark Side of the Moon en The Wall."
+David Bowie,1962,2016,"Brits muzikant en cultureel icoon die door zijn carrière voortdurend van stijl en personage veranderde, van Ziggy Stardust tot de Thin White Duke."
+Queen,1970,,"Britse rockband onder leiding van de charismatische Freddie Mercury, beroemd om bombastische rockhymnes zoals Bohemian Rhapsody en We Will Rock You."
+Michael Jackson,1964,2009,"De Amerikaanse King of Pop, wereldwijd bekend om zijn unieke dansstijl en tijdloze hits als Thriller en Billie Jean."
+Madonna,1979,,"Amerikaanse popster en provocateur die al decennialang de grenzen van muziek, mode en cultuur verlegt."
+Radiohead,1985,,"Britse alternatieve rockband die met albums als OK Computer en Kid A de grenzen van rockmuziek verlegde."
+Coldplay,1996,,"Britse rockband bekend om hun melodieuze en emotionele popmuziek, met wereldhits als The Scientist en Yellow."
+Adele,2006,,"Britse zangeres met een krachtige soulvoice, wereldberoemd door hartverscheurende ballads zoals Someone Like You en Hello."
+Ed Sheeran,2004,,"Britse singer-songwriter die met zijn akoestische gitaar en persoonlijke liedjes een van de bestverkochte artiesten ter wereld werd."
+Neil Young,1960,,"Canadese rockmusicus en singer-songwriter, een invloedrijke stem in de folkrock en countryrock, ook wel de peetvader van de grunge genoemd."
+James Taylor,1968,,"Amerikaanse singer-songwriter wiens zachte akoestische folkrock in de jaren 70 een geheel eigen geluid definieerde, met klassiekers als Fire and Rain."
+Elton John,1962,,"Britse pianist en poplegende, bekend om zijn extravagante optredens en tijdloze hits zoals Rocket Man en Tiny Dancer."
+Billy Joel,1964,,"Amerikaanse pianist en singer-songwriter, geliefd om zijn toegankelijke rocksongs en ballads zoals Piano Man en We Didn't Start the Fire."
+Stevie Wonder,1961,,"Amerikaans muzikaal wonderkind dat al op jonge leeftijd doorbrak en soul, funk en pop combineerde tot een uniek geluid met hits als Superstition en Isn't She Lovely."
+Golden Earring,1961,2021,"Legendarische Nederlandse rockband uit Den Haag, internationaal doorgebroken met Radar Love en Twilight Zone."
+Crosby Stills Nash & Young,1968,1970,"Amerikaans-Canadese supergroep uit de late jaren 60 en 70, bekend om hun rijke meerstemmige harmonieën en maatschappijkritische folksongs zoals Ohio en Helplessly Hoping."

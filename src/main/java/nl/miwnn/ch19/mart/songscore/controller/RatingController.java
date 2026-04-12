@@ -49,7 +49,15 @@ public class RatingController {
         newRating.setSong(song);
         log.debug("Nieuwe rating voor nummer {}", newRating.getSong().getTitle());
 
-        newRating.setRater((SongScoreUser) authentication.getPrincipal());
+        SongScoreUser currentUser = null;
+        boolean hasRatedSong = false;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            currentUser = (SongScoreUser) authentication.getPrincipal();
+            hasRatedSong = ratingService.raterAndSongCombinationAlreadyExists(song, currentUser);
+        }
+
+        newRating.setRater(currentUser);
         newRating.setPlacedAt(LocalDateTime.now());
 
         if (ratingService.raterAndSongCombinationAlreadyExists(newRating.getSong(), newRating.getRater())) {
@@ -60,6 +68,8 @@ public class RatingController {
         if (bindingResult.hasErrors()) {
             log.warn("Validatiefouten bij opslaan: {}", bindingResult.getErrorCount());
             model.addAttribute("song", song);
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("hasRated", hasRatedSong);
             model.addAttribute("newRating", newRating);
             return "song-detail";
         }
