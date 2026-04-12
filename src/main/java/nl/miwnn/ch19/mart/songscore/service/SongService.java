@@ -42,6 +42,13 @@ public class SongService {
         return songRepository.findAll();
     }
 
+    public List<Song> getAllSongsByArtist(String artistName) {
+        Artist artist = artistRepository.findArtistByNameIgnoreCase(artistName)
+                .orElseThrow(() -> new EntityNotFoundException("Artiest niet gevonden in database"));
+
+        return songRepository.findByArtistsContaining(artist);
+    }
+
     public List<Song> searchSongsByTitleContaining(String query) {
         return songRepository.findByTitleContainingIgnoreCase(query);
     }
@@ -58,7 +65,7 @@ public class SongService {
     @Transactional(readOnly = true)
     public Song getSongByTitleAndArtist(String title, String artistName) {
         Artist firstArtist = artistRepository.findArtistByNameIgnoreCase(artistName)
-                .orElseThrow(() -> new IllegalArgumentException("Artist with given name not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Artist with given name not found: " + artistName));
         Optional<Song> optionalSong = songRepository.findSongByTitleAndArtistsContains(title, firstArtist);
 
         if (optionalSong.isEmpty()) {

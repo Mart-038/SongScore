@@ -8,9 +8,12 @@ package nl.miwnn.ch19.mart.songscore.controller;
 import jakarta.validation.Valid;
 import nl.miwnn.ch19.mart.songscore.dto.ArtistFormDTO;
 import nl.miwnn.ch19.mart.songscore.model.Artist;
+import nl.miwnn.ch19.mart.songscore.model.Song;
 import nl.miwnn.ch19.mart.songscore.repository.ArtistRepository;
 import nl.miwnn.ch19.mart.songscore.repository.ImageRepository;
 import nl.miwnn.ch19.mart.songscore.service.ArtistService;
+import nl.miwnn.ch19.mart.songscore.service.RatingService;
+import nl.miwnn.ch19.mart.songscore.service.SongService;
 import nl.miwnn.ch19.mart.songscore.service.mapper.ArtistMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +33,16 @@ public class ArtistController {
     private static final Logger log = LoggerFactory.getLogger(ArtistController.class);
     private final ArtistMapper artistMapper;
     private final ArtistService artistService;
+    private final RatingService ratingService;
+    private final SongService songService;
 
-    public ArtistController(ArtistMapper artistMapper, ArtistService artistService) {
+    public ArtistController(ArtistMapper artistMapper,
+                            ArtistService artistService,
+                            RatingService ratingService, SongService songService) {
         this.artistMapper = artistMapper;
         this.artistService = artistService;
+        this.ratingService = ratingService;
+        this.songService = songService;
     }
 
     @GetMapping("/all")
@@ -104,7 +113,11 @@ public class ArtistController {
     @GetMapping("/detail/{artistName}")
     public String showArtistDetailPage(@PathVariable String artistName, Model model) {
         Artist artist = artistService.getArtistByName(artistName);
+        Double averageRating = ratingService.getAverageRatingForArtist(artist);
+        List<Song> songsByArtist = songService.getAllSongsByArtist(artistName);
         model.addAttribute("artist", artist);
+        model.addAttribute("averageRating", averageRating);
+        model.addAttribute("songsByArtist", songsByArtist);
         return "artist-detail";
     }
 }

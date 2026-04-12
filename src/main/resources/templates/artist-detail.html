@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{/fragments/general :: baseheader(~{:: title})}">
     <title th:text="${artist.name}">Artiestoverzicht</title>
@@ -8,30 +9,121 @@
 <nav th:replace="~{/fragments/general :: navbar}"></nav>
 
 <div class="container">
-    <h1 th:text="${artist.name}">Detailpagina</h1>
 
-    <div class="row">
-        <div class="col">
-            <p>Deze artiest is begonnen in <span th:text="${artist.activeSince}">jaar</span></p>
+    <div class="d-flex flex-column flex-md-row gap-4 align-items-start align-items-md-end mb-5">
+
+        <div class="col-6 col-sm-4 flex-shrink-0">
+            <div class="ratio ratio-1x1">
+                <img th:if="${artist.image}"
+                     th:src="@{/image/{id}(id=${artist.image.getId()})}"
+                     th:alt="${artist.name}"
+                     class="object-fit-cover rounded-circle shadow flex-shrink-0"/>
+                <div th:unless="${artist.image}"
+                     class="object-fit-cover rounded-circle bg-light border d-flex align-items-center
+                            justify-content-center flex-shrink-0 text-secondary">
+                    <i class="bi bi-person-fill fs-1"></i>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            <div class="gap-2 justify-content-center pb-5">
-                <a th:href="@{/artist/edit/{artist}(artist=${artist.name})}">
-                    <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                </a>
+
+        <div class="flex-grow-1">
+            <p class="text-uppercase text-muted small fw-semibold mb-1">Artiest</p>
+            <h1 class="display-5 fw-semibold mb-3" th:text="${artist.name}">Naam</h1>
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge rounded-pill text-bg-secondary fs-6 fw-normal">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    <span th:if="${artist.activeUntil != null}"
+                          th:text="${artist.activeSince} + ' – ' + ${artist.activeUntil}">
+                        1990 – 2005
+                    </span>
+                    <span th:unless="${artist.activeUntil != null}"
+                          th:text="${artist.activeSince} + ' – heden'">
+                        2001 – heden
+                    </span>
+                </span>
+
+                <span th:if="${averageRating != null}"
+                      class="badge rounded-pill text-bg-warning fs-6 fw-normal">
+                    <i class="bi bi-star-fill me-1"></i>
+                    <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.2</span>
+                    <span class="opacity-75 small">/ 5</span>
+                </span>
+                <span th:unless="${averageRating != null}"
+                      class="badge rounded-pill text-bg-light border fs-6 fw-normal text-muted">
+                <i class="bi bi-star me-1"></i>Nog geen beoordelingen
+                </span>
             </div>
-            <div class="gap-2 justify-content-center pb-5">
-                <a th:href="@{/artist/delete/{artist}(artist=${artist.name})}">
-                    <button class="btn btn-primary rounded-circle p-3 lh-1" type="button">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </a>
-            </div>
+        </div>
+
+        <p th:if="${artist.bio}"
+           th:text="${artist.bio}"
+           class="text-muted mb-4"
+           style="max-width: 65ch; line-height: 1.7;">
+            Biografie...
+        </p>
+
+        <div class="d-flex flex-wrap gap-2" sec:authorize="hasRole('ADMIN')">
+            <a class="btn btn-outline-primary btn-sm"
+               th:href="@{/artist/edit/{name}(name=${artist.name})}">
+                <i class="bi bi-pencil-square me-1"></i>Bewerken
+            </a>
+            <a class="btn btn-outline-danger btn-sm"
+               th:href="@{/artist/delete/{name}(name=${artist.name})}">
+                <i class="bi bi-trash me-1"></i>Verwijderen
+            </a>
         </div>
     </div>
 </div>
+
+<div th:unless="${#lists.isEmpty(songsByArtist)}">
+    <h2 class="h5 text-uppercase text-muted fw-semibold mb-3 text-center">
+        <i class="bi bi-music-note-list me-2"></i>Nummers
+    </h2>
+
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 justify-content-center">
+        <div class="col" th:each="song : ${songsByArtist}">
+            <a th:href="@{/song/detail/{artist}/{title}(artist=${song.artists[0].name}, title=${song.title})}"
+               class="text-decoration-none text-dark">
+                <div class="card h-100 border-0 shadow-sm song-card">
+
+                    <div class="ratio ratio-1x1">
+                        <img th:if="${song.albumCover}"
+                             th:src="@{/image/{id}(id=${song.albumCover.getId()})}"
+                             th:alt="${song.title}"
+                             class="card-img-top"
+                             style="object-fit: cover;"/>
+                        <div th:unless="${song.albumCover}"
+                             class="card-img-top bg-light d-flex align-items-center
+                                    justify-content-center text-secondary">
+                            <i class="bi bi-music-note-beamed fs-2"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-2">
+                        <p class="card-title fw-semibold small mb-0 text-truncate"
+                           th:text="${song.title}">Titel</p>
+                        <p class="card-text text-muted small mb-0">
+                            <span th:text="${song.year}">2000</span>
+                            <span th:if="${song.genre}"
+                                  class="ms-1 badge rounded-pill text-bg-warning fw-normal"
+                                  style="font-size: 0.7rem;"
+                                  th:text="${song.genre}">Genre</span>
+                        </p>
+                    </div>
+
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:if="${#lists.isEmpty(songsByArtist)}"
+     class="text-center text-muted py-5">
+    <i class="bi bi-music-note-beamed fs-1 d-block mb-2 opacity-25"></i>
+    <p class="small">Geen nummers gevonden voor deze artiest.</p>
+</div>
+
 
 <footer th:replace="~{/fragments/general :: footer}"></footer>
 

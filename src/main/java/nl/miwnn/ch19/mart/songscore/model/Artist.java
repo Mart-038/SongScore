@@ -8,6 +8,9 @@ package nl.miwnn.ch19.mart.songscore.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Artist {
 
@@ -33,7 +36,6 @@ public class Artist {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     private Image image;
-
 
     public Artist() {
     }

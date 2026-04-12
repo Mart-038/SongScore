@@ -5,6 +5,7 @@ package nl.miwnn.ch19.mart.songscore.service;
  * Handles business logic regarding SongScore users
  * */
 
+import jakarta.persistence.EntityNotFoundException;
 import nl.miwnn.ch19.mart.songscore.dto.NewSongScoreUserDTO;
 import nl.miwnn.ch19.mart.songscore.model.SongScoreUser;
 import nl.miwnn.ch19.mart.songscore.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SongScoreUserService implements UserDetailsService {
@@ -51,5 +53,10 @@ public class SongScoreUserService implements UserDetailsService {
 
     public List<SongScoreUser> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public SongScoreUser getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Gebruiker niet gevonden in database"));
     }
 }

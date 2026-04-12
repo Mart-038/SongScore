@@ -6,8 +6,11 @@ package nl.miwnn.ch19.mart.songscore.controller;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import nl.miwnn.ch19.mart.songscore.dto.RatingCsvDTO;
 import nl.miwnn.ch19.mart.songscore.model.*;
 import nl.miwnn.ch19.mart.songscore.repository.*;
+import nl.miwnn.ch19.mart.songscore.service.SongScoreUserService;
+import nl.miwnn.ch19.mart.songscore.service.SongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +36,8 @@ public class InitializeController {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SongService songService;
+    private final SongScoreUserService songScoreUserService;
 
     private final Logger log = LoggerFactory.getLogger(InitializeController.class);
 
@@ -54,13 +59,17 @@ public class InitializeController {
             RatingRepository ratingRepository,
             UserRepository userRepository,
             ImageRepository imageRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            SongService songService,
+            SongScoreUserService songScoreUserService) {
         this.songRepository = songRepository;
         this.artistRepository = artistRepository;
         this.ratingRepository = ratingRepository;
         this.userRepository = userRepository;
         this.imageRepository = imageRepository;
         this.passwordEncoder = passwordEncoder;
+        this.songService = songService;
+        this.songScoreUserService = songScoreUserService;
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -102,7 +111,11 @@ public class InitializeController {
                     Map.entry("Neil Young", "neil_young.jpg"),
                     Map.entry("James Taylor", "james_taylor.webp"),
                     Map.entry("Billy Joel", "billy_joel.jpg"),
-                    Map.entry("Golden Earring", "golden_earring.webp")
+                    Map.entry("Golden Earring", "golden_earring.webp"),
+                    Map.entry("Madonna", "madonna.webp"),
+                    Map.entry("Crosby Stills Nash & Young", "crosby_stills_nash_young.jpg"),
+                    Map.entry("Elton John", "elton_john.webp"),
+                    Map.entry("Paul McCartney", "paul_mccartney.jpg")
             );
 
             List<Artist> artists = csvToBean.parse();
@@ -120,14 +133,19 @@ public class InitializeController {
     }
 
     private void songSeed() {
+        Reader reader;
         try {
             ClassPathResource resource = new ClassPathResource("/seedData/songs.csv");
-            Reader reader = new InputStreamReader(resource.getInputStream());
+            reader = new InputStreamReader(resource.getInputStream());
 
-            CsvToBean<Song> csvToBean = new CsvToBeanBuilder<Song>(reader)
-                    .withType(Song.class)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .build();
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        }
+
+        CsvToBean<Song> csvToBean = new CsvToBeanBuilder<Song>(reader)
+                .withType(Song.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
 
             Map<String, String> songImages = Map.ofEntries(
                     Map.entry("Hey Jude", "Heyjude1.png"),
@@ -135,52 +153,69 @@ public class InitializeController {
                     Map.entry("Heroes", "heroes.png"),
                     Map.entry("Bohemian Rhapsody", "Queen_A_Night_At_The_Opera.png"),
                     Map.entry("Billie Jean", "Michael_Jackson_-_Thriller.png"),
+                    Map.entry("Thriller", "Michael_Jackson_-_Thriller.png"),
+                    Map.entry("Beat It", "Michael_Jackson_-_Thriller.png"),
+                    Map.entry("Ben", "BenMichaelJackson.jpg"),
+                    Map.entry("Off the Wall", "Off_the_wall.jpg"),
+                    Map.entry("Rock with You", "Off_the_wall.jpg"),
                     Map.entry("Like a Prayer", "Madonna_-_Like_a_Prayer_album.png"),
                     Map.entry("Creep", "pablohoney.jpg"),
                     Map.entry("Fix You", "Coldplay_X&Y.svg"),
                     Map.entry("Rolling in the Deep", "Adele_-_21.png"),
-                    Map.entry("Shape of You", "Divide_cover.png")
+                    Map.entry("Shape of You", "Divide_cover.png"),
+                    Map.entry("We Will Rock You", "Queen_News_Of_The_World.png"),
+                    Map.entry("I'm in Love with My Car", "Queen_A_Night_At_The_Opera.png"),
+                    Map.entry("Here Comes the Sun", "The_Beatles_Abbey_Road_album_cover.jpg")
             );
 
-            Map<String, String> songArtists = Map.ofEntries(
-                    Map.entry("Hey Jude", "The Beatles"),
-                    Map.entry("Comfortably Numb", "Pink Floyd"),
-                    Map.entry("Heroes", "David Bowie"),
-                    Map.entry("Bohemian Rhapsody", "Queen"),
-                    Map.entry("Billie Jean", "Michael Jackson"),
-                    Map.entry("Like a Prayer", "Madonna"),
-                    Map.entry("Creep", "Radiohead"),
-                    Map.entry("Fix You", "Coldplay"),
-                    Map.entry("Rolling in the Deep", "Adele"),
-                    Map.entry("Shape of You", "Ed Sheeran"),
-                    Map.entry("We Will Rock You", "Queen"),
-                    Map.entry("I'm in Love with My Car", "Queen"),
-                    Map.entry("Here Comes the Sun", "The Beatles")
+            Map<String, List<String>> songArtists = Map.ofEntries(
+                    Map.entry("Hey Jude", List.of("The Beatles")),
+                    Map.entry("Comfortably Numb", List.of("Pink Floyd")),
+                    Map.entry("Heroes", List.of("David Bowie")),
+                    Map.entry("Bohemian Rhapsody", List.of("Queen")),
+                    Map.entry("Billie Jean", List.of("Michael Jackson")),
+                    Map.entry("Thriller", List.of("Michael Jackson")),
+                    Map.entry("Beat It", List.of("Michael Jackson")),
+                    Map.entry("Ben", List.of("Michael Jackson")),
+                    Map.entry("Off the Wall", List.of("Michael Jackson")),
+                    Map.entry("Rock with You", List.of("Michael Jackson")),
+                    Map.entry("Say Say Say", List.of("Michael Jackson", "Paul McCartney")),
+                    Map.entry("The Girl is Mine", List.of("Michael Jackson", "Paul McCartney")),
+                    Map.entry("Like a Prayer", List.of("Madonna")),
+                    Map.entry("Creep", List.of("Radiohead")),
+                    Map.entry("Fix You", List.of("Coldplay")),
+                    Map.entry("Rolling in the Deep", List.of("Adele")),
+                    Map.entry("Shape of You", List.of("Ed Sheeran")),
+                    Map.entry("We Will Rock You", List.of("Queen")),
+                    Map.entry("I'm in Love with My Car", List.of("Queen")),
+                    Map.entry("Here Comes the Sun", List.of("The Beatles"))
             );
 
             List<Song> songs = csvToBean.parse();
-            List<Artist> artists = artistRepository.findAll();
 
-            for (int i = 0; i < songs.size(); i++) {
-                Song song = songs.get(i);
-
-                String artistName = songArtists.get(song.getTitle());
-                if (artistName != null) {
-                    artistRepository.findArtistByNameIgnoreCase(artistName)
-                            .ifPresent(artist -> song.getArtists().add(artist));
+            for (Song song : songs) {
+                List<String> artistNames = songArtists.get(song.getTitle());
+                if (artistNames != null) {
+                    for (String artistName : artistNames) {
+                        artistRepository.findArtistByNameIgnoreCase(artistName)
+                                .ifPresent(artist -> song.getArtists().add(artist));
+                    }
                 }
 
                 String filename = songImages.get(song.getTitle());
                 if (filename != null) {
-                    Image savedImage = imageRepository
-                            .save(loadImage("/images/seedData/" + filename, "albumCover"));
+                    Image savedImage = null;
+                    try {
+                        savedImage = imageRepository
+                                .save(loadImage("/images/seedData/" + filename, "albumCover"));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     song.setAlbumCover(savedImage);
                 }
                 songRepository.save(song);
             }
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
-        }
+
     }
 
     private void userSeed() {
@@ -190,9 +225,52 @@ public class InitializeController {
                 new SongScoreUser("Michael", passwordEncoder.encode(michaelPassword), "USER"));
         userRepository.save(
                 new SongScoreUser("Yasmine", passwordEncoder.encode(yasminePassword), "USER"));
+        userRepository.save(new SongScoreUser("Sophie",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Lucas",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Emma",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Noah",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Lena",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Milan",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Sara",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Daan",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Julia",
+                passwordEncoder.encode("userPw"), "USER"));
+        userRepository.save(new SongScoreUser("Tom",
+                passwordEncoder.encode("userPw"), "USER"));
     }
 
     private void ratingSeed() {
+        ClassPathResource resource = new ClassPathResource("/seedData/ratings.csv");
+        Reader reader;
+        try {
+            reader = new InputStreamReader(resource.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        CsvToBean<RatingCsvDTO> csvToBean = new CsvToBeanBuilder<RatingCsvDTO>(reader)
+                .withType(RatingCsvDTO.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
+
+        List<RatingCsvDTO> ratingsDto = csvToBean.parse();
+
+        for (RatingCsvDTO dto : ratingsDto) {
+            Rating rating = new Rating();
+            rating.setRateScore(dto.getRateScore());
+            rating.setDescription(dto.getDescription());
+            rating.setSong(songService.getSongByTitleAndArtist(dto.getSongTitle(), dto.getArtistName()));
+            rating.setRater(songScoreUserService.getUserByUsername(dto.getUsername()));
+            ratingRepository.save(rating);
+        }
 
     }
 

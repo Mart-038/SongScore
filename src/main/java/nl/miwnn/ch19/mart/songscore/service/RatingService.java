@@ -6,6 +6,7 @@ package nl.miwnn.ch19.mart.songscore.service;
  * */
 
 import jakarta.persistence.EntityNotFoundException;
+import nl.miwnn.ch19.mart.songscore.model.Artist;
 import nl.miwnn.ch19.mart.songscore.model.Rating;
 import nl.miwnn.ch19.mart.songscore.model.Song;
 import nl.miwnn.ch19.mart.songscore.model.SongScoreUser;
@@ -29,6 +30,11 @@ public class RatingService {
             throw new EntityNotFoundException("Deze rating kon niet worden gevonden");
         }
         return optionalRating.get();
+    }
+
+    public double getAverageRatingForArtist(Artist artist){
+        Double average = ratingRepository.findAverageRatingByArtistId(artist.getId());
+        return average != null ? average : 0.0;
     }
 
     public boolean raterAndSongCombinationAlreadyExists(Song song, SongScoreUser rater) {

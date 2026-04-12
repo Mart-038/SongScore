@@ -18,6 +18,8 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     List<Song> findByTitleContainingIgnoreCase(String title);
 
+    List<Song> findByArtistsContaining(Artist artist);
+
     @Query("""
             SELECT s FROM Song s JOIN s.artists a
             WHERE s.title = :title AND a.id = :artistId""")
